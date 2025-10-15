@@ -1,0 +1,22 @@
+/* Enhanced glassmorphism card style */
+.login-card {
+    background: linear-gradient(120deg, rgba(34, 34, 34, 0.85) 60%, rgba(29, 185, 84, 0.08) 100%);
+    box-shadow:
+        0 8px 32px 0 rgba(0, 0, 0, 0.45),
+        0 1.5px 8px 0 rgba(29, 185, 84, 0.08);
+    border: 1.5px solid #404040;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+/* Enhanced button style */
+.login-card button {
+    box-shadow: 0 2px 16px 0 rgba(29, 185, 84, 0.18);
+    transition:
+        box-shadow 0.3s,
+        background 0.3s;
+}
+.login-card button:hover {
+    box-shadow: 0 0 32px 0 rgba(29, 185, 84, 0.35);
+    background: linear-gradient(90deg, #1db954 60%, #1ed760 100%);
+}
