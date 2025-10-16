@@ -1,77 +1,65 @@
-import {Controller, Get, Query, Req, Res} from '@nestjs/common';
-import { Request as ExpressRequest, Response as ExpressResponse } from 'express';
+import {Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
+import { Response as ExpressResponse } from 'express';
 import { AuthService } from './auth.service';
+import {SpotifyAuthGuard} from './guards/spotify-auth.guard';
+import {ConfigService} from '@nestjs/config';
+import {JwtAuthGuard} from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
-    private frontendUri = process.env.FRONTEND_BASE_URL;
+    constructor(
+        private readonly authService: AuthService,
+        private readonly configService: ConfigService,
+    ) {}
 
-    constructor(private readonly authService: AuthService) {}
+    private frontendUrl = this.configService.get("FRONTEND_BASE_URL");
 
+    /**
+     * Initiate Spotify OAuth login
+     */
     @Get('spotify')
-    async getSpotifyLoginUrl() {
-        const redirectUrl = await this.authService.getSpotifyAuthUrl();
-        return { redirectUrl };
+    @UseGuards(SpotifyAuthGuard)
+    spotifyLogin(): void {
+        return;
     }
 
+    /**
+     * Handle Spotify OAuth callback
+     */
+    @UseGuards(SpotifyAuthGuard)
     @Get('spotify/callback')
-    async handleSpotifyCallback(
-        @Query('code') code: string,
-        @Res() res: ExpressResponse,
-    ) {
-        try {
-            // Exchange authorization code for tokens using AuthService
-            const tokens = await this.authService.exchangeCodeForTokens(code);
+    async spotifyAuthRedirect(
+        @Req() req: any,
+        @Res({ passthrough: false }) res: ExpressResponse,
+    ): Promise<void> {
+        // Destructure tokens from req set by SpotifyAuthGuard
+        const { accessToken, refreshToken, profile: user } = req.user;
 
-            console.log("Writing Spotify token to cookie: ", tokens.access_token);
+        // Update or create user in database
+        await this.authService.saveUserInfo(accessToken, refreshToken, user);
 
-            // Save access token in HTTP-only cookie
-            // Note: Setting domain to localhost allows cookie to work across ports
-            res.cookie('access_token', tokens.access_token, {
-                httpOnly: true,
-                sameSite: 'lax',
-                secure: false, // set to true in production with HTTPS
-                maxAge: tokens.expires_in * 1000,
-                path: '/',
-            });
+        // Generate JWT for our app
+        const jwt: string = this.authService.login(user);
 
-            console.log("Spotify access token cookie set");
-            console.log("Set-Cookie header:", res.getHeader('Set-Cookie'));
-
-            // TODO: Save tokens in database as needed
-
-            // Redirect to Angular frontend
-            res.redirect(this.frontendUri + `/home`);
-        } catch (error) {
-            console.error('Spotify callback error:', error);
-            res.redirect(this.frontendUri + '/error');
-        }
+        // Redirect to frontend with JWT as query param
+        return res.redirect(`${this.frontendUrl}/login-callback?token=${jwt}`);
     }
 
-    @Get('spotify/check')
-    async checkSpotifyToken(@Req() req: ExpressRequest, @Res() res: ExpressResponse) {
-        console.log("=== Checking Spotify Token ===");
-        console.log("All cookies received:", req.cookies);
-        console.log("Cookie header:", req.headers.cookie);
+    /**
+     * Get the authenticated user's profile
+     */
+    @Get('profile')
+    @UseGuards(JwtAuthGuard)
+    async getProfile(@Req() req: any) {
+        // Fetch user from database using spotifyId from JWT payload
+        const user = await this.authService.getUserBySpotifyId(req.user.spotifyId);
 
-        const accessToken = req.cookies['access_token'];
-        console.log("Spotify access token:", accessToken);
-
-        // If no token, user is not logged in
-        if (!accessToken) {
-            console.log("No access token found - returning 401");
-            return res.status(401).json({ valid: false });
-        }
-
-        // Validate the access token using AuthService
-        const validation = await this.authService.validateSpotifyToken(accessToken);
-
-        if (validation.valid) {
-            console.log("Token is valid");
-            return res.json({ valid: true, profile: validation.profile });
-        } else {
-            console.log("Token is invalid");
-            return res.status(401).json({ valid: false });
-        }
+        return {
+            id: user.id,
+            spotifyId: user.spotifyId,
+            displayName: user.displayName,
+            email: user.email,
+            profileImage: user.profileImage,
+        };
     }
 }

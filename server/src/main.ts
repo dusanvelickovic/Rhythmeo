@@ -6,14 +6,14 @@ async function bootstrap() {
     const app = await NestFactory.create(AppModule);
 
     app.enableCors({
-        origin: '*',
+        origin: 'http://localhost:4200',
         credentials: true,
-        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-        allowedHeaders: 'Content-Type, Accept',
+        allowedHeaders: ['Content-Type', 'Authorization', 'authorization'],
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     });
 
     app.use(cookieParser());
 
-    await app.listen(3000, 'api.rhythmeo.test');
+    await app.listen(3000);
 }
 bootstrap();
