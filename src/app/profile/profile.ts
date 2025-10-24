@@ -2,10 +2,13 @@ import {Component, OnInit} from '@angular/core';
 import {UserService} from '../core/services/user.service';
 import {User} from '../core/types/user';
 import {AuthService} from '../core/services/auth.service';
+import {RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-profile',
-  imports: [],
+    imports: [
+        RouterLink
+    ],
   templateUrl: './profile.html',
 })
 export class Profile implements OnInit{
