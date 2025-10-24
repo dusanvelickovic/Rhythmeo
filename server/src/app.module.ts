@@ -30,8 +30,6 @@ import { UsersModule } from './users/users.module';
             }),
             inject: [ConfigService],
         }),
-        AuthModule,
-        UsersModule,
     ],
     controllers: [AppController],
     providers: [AppService],

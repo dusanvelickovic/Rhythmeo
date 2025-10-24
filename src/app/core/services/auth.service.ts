@@ -1,18 +1,9 @@
-import { Injectable } from '@angular/core';
+import {Injectable, signal} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
-// import { SpotifyUser } from '../models/user.model';
-
-export interface User {
-    id: string;
-    spotifyId: string;
-    displayName: string;
-    email: string;
-    profileImage?: string;
-    country?: string;
-}
+import { User } from '../types/user';
 
 @Injectable({
     providedIn: 'root'
@@ -60,5 +51,16 @@ export class AuthService {
 
     isAuthenticated(): boolean {
         return !!this.getToken();
+    }
+
+    /**
+     * Logs out the current user by clearing stored data and redirecting to login.
+     */
+    logout() {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('spotifyUser');
+        this.currentUserSubject.next(null);
+
+        this.router.navigate(['/login']);
     }
 }

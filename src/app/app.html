@@ -1,9 +1,16 @@
-<div class="animated-gradient-bg-outer">
+<div class="animated-gradient-bg-outer overflow-hidden" style="position:relative;">
     <div class="animated-gradient-bg">
         <div class="green-fade"></div>
         <div class="green-fade green-fade-2"></div>
         <div class="green-fade green-fade-3"></div>
     </div>
+    <div style="position:absolute;inset:0;background:rgba(0,0,0,0.6);pointer-events:none;z-index: -1;"></div>
 </div>
 
-<router-outlet />
+<div class="absolute inset-0">
+    @if (authService.isAuthenticated()) {
+        <app-navigation></app-navigation>
+    }
+    <router-outlet></router-outlet>
+</div>
+

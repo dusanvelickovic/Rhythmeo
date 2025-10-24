@@ -2,9 +2,10 @@ import { Routes } from '@angular/router';
 import { Login } from './login/login';
 import { Home } from './home/home';
 import { Error } from './error/error';
-import {AuthCallback} from './auth-callback/auth-callback';
-import {authGuard} from './core/guards/auth.guard';
-import {redirectIfAuthnenticated} from './core/guards/redirect-if-authnenticated.guard';
+import { AuthCallback } from './auth-callback/auth-callback';
+import { authGuard } from './core/guards/auth.guard';
+import { redirectIfAuthnenticated } from './core/guards/redirect-if-authnenticated.guard';
+import { Profile } from './profile/profile';
 
 export const routes: Routes = [
     // If no path is provided, redirect to /home
@@ -26,6 +27,7 @@ export const routes: Routes = [
     // Protected routes
     { path: 'home', component: Home, canActivate: [authGuard] },
     { path: 'home2', component: Home, canActivate: [authGuard] },
+    { path: 'profile', component: Profile, canActivate: [authGuard] },
 
     // Error handling
     { path: 'auth/error', redirectTo: '/login', pathMatch: 'full' },
