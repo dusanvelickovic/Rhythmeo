@@ -1,0 +1,15 @@
+.center-vertical-line {
+    position: absolute;
+    top: 25px;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-0.5px);
+    width: 1px;
+    background: rgba(255, 255, 255, 0.25);
+    z-index: 10;
+    pointer-events: none;
+}
+
+@media (max-width: 640px) {
+    .center-vertical-line { display: none; }
+}

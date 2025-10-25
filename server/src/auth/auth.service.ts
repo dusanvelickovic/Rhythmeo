@@ -71,42 +71,33 @@ export class AuthService {
         return this.jwtService.sign(payload);
     }
 
-    // async getUserWithValidToken(userId: string) {
-    //     const user = await this.findById(userId);
-    //
-    //     // Ako je token istekao - refresh
-    //     if (user.tokenExpiresAt < now) {
-    //         const newTokens = await this.refreshAccessToken(user.refreshToken);
-    //         // Ažurira tokene u bazi
-    //         await this.usersService.updateTokens(...);
-    //     }
-    //
-    //     return user;
-    // }
+    /**
+     * Get user's access token by Spotify ID
+     */
+    async getAccessToken(spotifyId: string): Promise<string | null> {
+        return this.userRepository
+            .findOne({ where: { spotifyId } })
+            .then(user => user ? user.accessToken : null);
+    }
 
     /**
-     * Generate a random code verifier for PKCE
+     * Get user's refresh token by Spotify ID
      */
-    // private verifier = this.generateCodeVerifier(128);
-
-    // private generateCodeVerifier(length: number): string {
-    //     let text = '';
-    //     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    //
-    //     for (let i = 0; i < length; i++) {
-    //         text += possible.charAt(Math.floor(Math.random() * possible.length));
-    //     }
-    //
-    //     return text;
-    // }
+    async getRefreshToken(spotifyId: string): Promise<string | null> {
+        return this.userRepository
+            .findOne({ where: { spotifyId } })
+            .then(user => user ? user.refreshToken : null);
+    }
 
     /**
-     * Generate code challenge from verifier using SHA256
+     * Update user's access token
      */
-    // private generateCodeChallenge(codeVerifier: string): string {
-    //     return crypto
-    //         .createHash('sha256')
-    //         .update(codeVerifier)
-    //         .digest('base64url');
-    // }
+    async updateAccessToken(spotifyId: string, newAccessToken: string): Promise<void> {
+        const user = await this.userRepository.findOne({ where: { spotifyId } });
+        if (user) {
+            user.accessToken = newAccessToken;
+            user.tokenExpiresAt = new Date(Date.now() + 3600 * 1000); // Update expiry time
+            await this.userRepository.save(user);
+        }
+    }
 }

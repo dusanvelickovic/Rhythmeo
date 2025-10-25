@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { SpotifyModule } from './spotify/spotify.module';
 
 @Module({
     imports: [
@@ -12,8 +13,6 @@ import { UsersModule } from './users/users.module';
             isGlobal: true,
             envFilePath: '.env',
         }),
-        AuthModule,
-        UsersModule,
         TypeOrmModule.forRootAsync({
             imports: [ConfigModule],
             useFactory: (configService: ConfigService) => ({
@@ -30,6 +29,9 @@ import { UsersModule } from './users/users.module';
             }),
             inject: [ConfigService],
         }),
+        AuthModule,
+        UsersModule,
+        SpotifyModule,
     ],
     controllers: [AppController],
     providers: [AppService],
