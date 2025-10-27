@@ -1,7 +1,8 @@
-import {Component, Input, OnDestroy, OnInit, Output, EventEmitter, signal} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit, OnChanges, SimpleChanges, Output, EventEmitter, signal} from '@angular/core';
 import {PlayerState, SpotifyPlayerService} from '../../core/services/spotify-player.service';
 import {interval, Subject, takeUntil} from 'rxjs';
 import {Track} from '../../core/types/track';
+import {LikedSongsService} from '../../core/services/liked-songs.service';
 
 @Component({
   selector: 'app-spotify-player',
@@ -9,7 +10,7 @@ import {Track} from '../../core/types/track';
   templateUrl: './spotify-player.html',
   styleUrl: './spotify-player.css'
 })
-export class SpotifyPlayer implements OnInit, OnDestroy{
+export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
     @Input() track: Track|null = null;
     @Input() nextTrackUri: string|null = null;
     @Input() previousTrackUri: string|null = null;
@@ -18,18 +19,29 @@ export class SpotifyPlayer implements OnInit, OnDestroy{
 
     private destroy$ = new Subject<void>();
     public showVolumeSlider = signal(false);
+    public isLiked = signal(false);
 
     playerState: PlayerState | null = null;
     isReady = false;
     volume = 20;
 
-    constructor(private spotifyPlayerService: SpotifyPlayerService) {}
+    constructor(
+        private spotifyPlayerService: SpotifyPlayerService,
+        private likedSongsService: LikedSongsService
+    ) {}
 
     /**
      * Toggle volume slider visibility
      */
     toggleVolumeSlider(): void {
         this.showVolumeSlider.set(!this.showVolumeSlider());
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        // Check liked status when track changes
+        if (changes['track'] && changes['track'].currentValue) {
+            this.checkLikedStatus();
+        }
     }
 
     async ngOnInit(): Promise<void> {
@@ -50,6 +62,11 @@ export class SpotifyPlayer implements OnInit, OnDestroy{
         // Set playerState track
         if (this.playerState && this.track) {
             this.playerState.current_track = this.track;
+        }
+
+        // Check if current track is liked
+        if (this.track?.id) {
+            this.checkLikedStatus();
         }
 
         // Update position every second
@@ -117,23 +134,91 @@ export class SpotifyPlayer implements OnInit, OnDestroy{
         await this.spotifyPlayerService.previousTrack();
     }
 
+    /**
+     * Handle seek from slider
+     */
     async onSeek(event: Event): Promise<void> {
         const input = event.target as HTMLInputElement;
         const position = parseInt(input.value, 10);
         await this.spotifyPlayerService.seek(position);
     }
 
+    /**
+     * Handle volume change from slider
+     */
     async onVolumeChange(event: Event): Promise<void> {
         const input = event.target as HTMLInputElement;
         this.volume = parseInt(input.value, 10);
         await this.spotifyPlayerService.setVolume(this.volume / 100);
     }
 
+    /**
+     * Format time in milliseconds to mm:ss
+     */
     formatTime(ms: number): string {
         const totalSeconds = Math.floor(ms / 1000);
         const minutes = Math.floor(totalSeconds / 60);
         const seconds = totalSeconds % 60;
         return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    /**
+     * Check if the current track is liked
+     */
+    checkLikedStatus(): void {
+        if (!this.track?.id) return;
+
+        this.likedSongsService.checkIfLiked(this.track.id)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (response) => {
+                    this.isLiked.set(response.isLiked);
+                },
+                error: (error) => {
+                    console.error('Failed to check liked status:', error);
+                }
+            });
+    }
+
+    /**
+     * Toggle like status for the current track
+     */
+    toggleLike(): void {
+        if (!this.track) return;
+
+        if (this.isLiked()) {
+            this.likedSongsService.unlikeSong(this.track.id)
+                .pipe(takeUntil(this.destroy$))
+                .subscribe({
+                    next: () => {
+                        this.isLiked.set(false);
+                        console.log('Track unliked');
+                    },
+                    error: (error) => {
+                        console.error('Failed to unlike track:', error);
+                    }
+                });
+        } else {
+            const songData = {
+                trackId: this.track.id,
+                trackName: this.track.name,
+                artistName: this.track.artists?.[0]?.name,
+                albumName: this.track.album?.name,
+                imageUrl: this.track.album?.images?.[0]?.url
+            };
+
+            this.likedSongsService.likeSong(songData)
+                .pipe(takeUntil(this.destroy$))
+                .subscribe({
+                    next: () => {
+                        this.isLiked.set(true);
+                        console.log('Track liked');
+                    },
+                    error: (error) => {
+                        console.error('Failed to like track:', error);
+                    }
+                });
+        }
     }
 
     ngOnDestroy(): void {

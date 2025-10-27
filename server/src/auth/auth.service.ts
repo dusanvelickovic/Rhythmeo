@@ -66,10 +66,11 @@ export class AuthService {
     /**
      * Generate JWT for authenticated user
      */
-    login(user: Profile): string {
+    login(user: Profile, dbUserId: string): string {
         const payload = {
             name: user.username,
             spotifyId: user.id,
+            id: dbUserId,
         };
 
         return this.jwtService.sign(payload);

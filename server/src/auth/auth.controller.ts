@@ -4,6 +4,7 @@ import { AuthService } from './auth.service';
 import {SpotifyAuthGuard} from './guards/spotify-auth.guard';
 import {ConfigService} from '@nestjs/config';
 import {JwtAuthGuard} from './guards/jwt-auth.guard';
+import {User} from '../users/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -36,10 +37,10 @@ export class AuthController {
         const { accessToken, refreshToken, profile: user } = req.user;
 
         // Update or create user in database
-        await this.authService.saveUserInfo(accessToken, refreshToken, user);
+        const dbUser: User = await this.authService.saveUserInfo(accessToken, refreshToken, user);
 
         // Generate JWT for our app
-        const jwt: string = this.authService.login(user);
+        const jwt: string = this.authService.login(user, dbUser.id);
 
         // Redirect to frontend with JWT as query param
         return res.redirect(`${this.frontendUrl}/login-callback?token=${jwt}`);

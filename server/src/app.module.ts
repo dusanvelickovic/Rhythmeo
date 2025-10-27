@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { SpotifyModule } from './spotify/spotify.module';
+import { LikedSongsModule } from './liked-songs/liked-songs.module';
 
 @Module({
     imports: [
@@ -35,6 +36,7 @@ import { SpotifyModule } from './spotify/spotify.module';
         AuthModule,
         UsersModule,
         SpotifyModule,
+        LikedSongsModule,
     ],
     controllers: [AppController],
     providers: [AppService],

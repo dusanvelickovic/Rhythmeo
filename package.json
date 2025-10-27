@@ -9,9 +9,9 @@
         "start:server:watch": "nodemon --watch server --exec ts-node -P server/tsconfig.json server/src/main.ts",
         "start:all": "concurrently \"npm start\" \"npm run start:server:watch\"",
         "build:server": "tsc -p server/tsconfig.json",
-        "migration:generate": "typeorm-ts-node-commonjs migration:generate -d ormconfig.ts",
-        "migration:run": "typeorm-ts-node-commonjs migration:run -d ormconfig.ts",
-        "migration:revert": "typeorm-ts-node-commonjs migration:revert -d ormconfig.ts"
+        "migration:generate": "ts-node -P server/tsconfig.json ./node_modules/typeorm/cli.js migration:generate -d ormconfig.js",
+        "migration:run": "ts-node -P server/tsconfig.json ./node_modules/typeorm/cli.js migration:run -d ormconfig.js",
+        "migration:revert": "ts-node -P server/tsconfig.json ./node_modules/typeorm/cli.js migration:revert -d ormconfig.js"
     },
     "prettier": {
         "printWidth": 100,
