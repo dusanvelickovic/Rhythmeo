@@ -1,17 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import * as crypto from 'crypto';
 import {JwtService} from '@nestjs/jwt';
 import { Profile } from 'passport-spotify';
-import {Repository} from 'typeorm';
-import {User} from '../users/user.entity';
-import {InjectRepository} from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from '../users/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { firstValueFrom } from 'rxjs';
+import { ConfigService } from '@nestjs/config';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly jwtService: JwtService,
         @InjectRepository(User)
-        private readonly userRepository: Repository<User>
+        private readonly userRepository: Repository<User>,
+        private readonly configService: ConfigService,
+        private readonly http: HttpService,
     ) {}
 
     /**
@@ -75,9 +79,29 @@ export class AuthService {
      * Get user's access token by Spotify ID
      */
     async getAccessToken(spotifyId: string): Promise<string | null> {
-        return this.userRepository
-            .findOne({ where: { spotifyId } })
-            .then(user => user ? user.accessToken : null);
+        const user = await this.userRepository.findOne({ where: { spotifyId } });
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        const expiresAtCet: string = user.tokenExpiresAt
+            ? user.tokenExpiresAt.toLocaleString('en-US', { timeZone: 'Europe/Berlin', hour12: false })
+            : null;
+
+        const nowCet: string = new Date().toLocaleString('en-US', { timeZone: 'Europe/Berlin', hour12: false });
+
+        // If token has expired, refresh it
+        if (new Date(expiresAtCet) <= new Date(nowCet)) {
+            this.refreshAccessToken(spotifyId).then(async (accessToken) => {
+                // Update the access token in database
+                await this.updateAccessToken(spotifyId, accessToken);
+
+                return accessToken;
+            })
+        }
+
+        // If token has NOT expired, return it
+        return user.accessToken;
     }
 
     /**
@@ -96,8 +120,40 @@ export class AuthService {
         const user = await this.userRepository.findOne({ where: { spotifyId } });
         if (user) {
             user.accessToken = newAccessToken;
-            user.tokenExpiresAt = new Date(Date.now() + 3600 * 1000); // Update expiry time
+            user.tokenExpiresAt = new Date(Date.now() + 3600 * 1000);
             await this.userRepository.save(user);
+        }
+    }
+
+    /**
+     * Refresh the Spotify access token using the refresh token
+     */
+    async refreshAccessToken(spotifyId: string): Promise<string> {
+        try {
+            const refreshToken = await this.getRefreshToken(spotifyId);
+            const clientId = this.configService.get<string>('SPOTIFY_CLIENT_ID');
+            const clientSecret = this.configService.get<string>('SPOTIFY_CLIENT_SECRET');
+
+            const response = await firstValueFrom(
+                this.http.post(
+                    'https://accounts.spotify.com/api/token',
+                    new URLSearchParams({
+                        grant_type: 'refresh_token',
+                        refresh_token: refreshToken,
+                    }).toString(),
+                    {
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'Authorization': `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
+                        },
+                    },
+                ),
+            );
+
+            return response.data.access_token;
+        }
+        catch (error) {
+            throw new Error(`Failed to refresh access token: ${error.message}`);
         }
     }
 }

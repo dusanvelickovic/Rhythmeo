@@ -1,0 +1,128 @@
+import {Component, Input, OnDestroy, OnInit, signal} from '@angular/core';
+import {PlayerState, SpotifyPlayerService} from '../../core/services/spotify-player.service';
+import {interval, Subject, takeUntil} from 'rxjs';
+import {Track} from '../../core/types/track';
+
+@Component({
+  selector: 'app-spotify-player',
+  imports: [],
+  templateUrl: './spotify-player.html',
+  styleUrl: './spotify-player.css'
+})
+export class SpotifyPlayer implements OnInit, OnDestroy{
+    @Input() track: Track|null = null;
+    @Input() nextTrackUri: string|null = null;
+
+    private destroy$ = new Subject<void>();
+    public showVolumeSlider = signal(false);
+
+    playerState: PlayerState | null = null;
+    isReady = false;
+    volume = 20;
+
+    constructor(private spotifyPlayerService: SpotifyPlayerService) {}
+
+    /**
+     * Toggle volume slider visibility
+     */
+    toggleVolumeSlider(): void {
+        this.showVolumeSlider.set(!this.showVolumeSlider());
+    }
+
+    async ngOnInit(): Promise<void> {
+        // Subscribe to player state
+        this.spotifyPlayerService.playerState$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((state) => {
+                this.playerState = state;
+            });
+
+        // Subscribe to ready state
+        this.spotifyPlayerService.ready$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((ready) => {
+                this.isReady = ready;
+            });
+
+        // Set playerState track
+        if (this.playerState && this.track) {
+            this.playerState.current_track = this.track;
+        }
+
+        // Update position every second
+        interval(1000)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(() => {
+                if (this.playerState && !this.playerState.paused) {
+                    this.playerState.position = Math.min(
+                        this.playerState.position + 1000,
+                        this.playerState.duration
+                    );
+                }
+            });
+    }
+
+    private songWasPlayed = false;
+    async togglePlay(): Promise<void> {
+        try {
+            // If the song was never played, play it from the beginning
+            // TODO: ugly fix
+            if (!this.songWasPlayed) {
+                // Mark as played
+                this.songWasPlayed = true;
+
+                // Play the track
+                await this.spotifyPlayerService.play(this.track?.uri);
+                console.log('Playing:', this.track?.name);
+            }
+            else {
+                // Toggle play/pause
+                await this.spotifyPlayerService.togglePlay();
+                console.log(this.playerState?.paused ? 'Paused' : 'Playing');
+            }
+
+        } catch (error) {
+            console.error('Failed to play track:', error);
+            // Fallback: otvori u Spotify app-u
+            window.open(this.track?.external_urls?.spotify, '_blank');
+        }
+    }
+
+    async nextTrack(): Promise<void> {
+        if (this.nextTrackUri) {
+            await this.spotifyPlayerService.play(this.nextTrackUri);
+            return;
+        }
+
+        await this.spotifyPlayerService.nextTrack();
+    }
+
+    async previousTrack(): Promise<void> {
+        await this.spotifyPlayerService.previousTrack();
+    }
+
+    async onSeek(event: Event): Promise<void> {
+        const input = event.target as HTMLInputElement;
+        const position = parseInt(input.value, 10);
+        await this.spotifyPlayerService.seek(position);
+    }
+
+    async onVolumeChange(event: Event): Promise<void> {
+        const input = event.target as HTMLInputElement;
+        this.volume = parseInt(input.value, 10);
+        await this.spotifyPlayerService.setVolume(this.volume / 100);
+    }
+
+    formatTime(ms: number): string {
+        const totalSeconds = Math.floor(ms / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+        this.spotifyPlayerService.cleanUpPlayerState();
+    }
+}

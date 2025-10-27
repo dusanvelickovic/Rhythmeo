@@ -33,4 +33,7 @@ export interface Track {
             width: number;
         }>;
     };
+    external_urls: {
+        spotify: string;
+    };
 }

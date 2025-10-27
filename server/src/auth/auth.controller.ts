@@ -1,4 +1,4 @@
-import {Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
+import {Controller, Get, NotFoundException, Req, Res, UseGuards} from '@nestjs/common';
 import { Response as ExpressResponse } from 'express';
 import { AuthService } from './auth.service';
 import {SpotifyAuthGuard} from './guards/spotify-auth.guard';
@@ -43,6 +43,23 @@ export class AuthController {
 
         // Redirect to frontend with JWT as query param
         return res.redirect(`${this.frontendUrl}/login-callback?token=${jwt}`);
+    }
+
+    /**
+     * Get Spotify access token for authenticated user
+     */
+    @UseGuards(JwtAuthGuard)
+    @Get('spotify/token')
+    async getSpotifyToken(@Req() req: any): Promise<{ accessToken: string }> {
+        const accessToken: string = await this.authService.getAccessToken(req.user.spotifyId);
+
+        if (!accessToken) {
+            throw new NotFoundException('Access token not found');
+        }
+
+        return {
+            accessToken: accessToken,
+        };
     }
 
     /**

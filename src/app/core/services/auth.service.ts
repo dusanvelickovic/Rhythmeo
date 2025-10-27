@@ -1,6 +1,6 @@
-import {Injectable, signal} from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { User } from '../types/user';
@@ -45,12 +45,29 @@ export class AuthService {
         );
     }
 
-    getToken(): string | null {
+    /**
+     * Retrieves the stored JWT token from local storage.
+     */
+    getJwtToken(): string | null {
         return localStorage.getItem('access_token');
     }
 
+    /**
+     * Retrieves the Spotify access token from the backend.
+     */
+    async getSpotifyAccessToken(): Promise<string | null> {
+        try {
+            const response: {accessToken: string} = await firstValueFrom(
+                this.http.get<{ accessToken: string }>(`${this.apiUrl}/auth/spotify/token`)
+            );
+            return response?.accessToken ?? null;
+        } catch (err) {
+            return null;
+        }
+    }
+
     isAuthenticated(): boolean {
-        return !!this.getToken();
+        return !!this.getJwtToken();
     }
 
     /**

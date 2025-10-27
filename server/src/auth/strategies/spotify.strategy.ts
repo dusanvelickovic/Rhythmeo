@@ -1,5 +1,5 @@
 import { PassportStrategy } from '@nestjs/passport';
-import {Profile, Strategy, VerifyCallback} from 'passport-spotify';
+import { Profile, Strategy } from 'passport-spotify';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
@@ -17,6 +17,7 @@ export class SpotifyStrategy extends PassportStrategy(Strategy, 'spotify') {
                 'user-read-recently-played',
                 'playlist-read-private',
                 'user-modify-playback-state',
+                'streaming',
             ],
         });
     }

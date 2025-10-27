@@ -2,8 +2,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, signal } from '@angular/core';
 import { SpotifyService } from '../core/services/spotify.service';
-import {Track} from '../core/types/track';
-import {TrackModal} from '../components/track-modal/track-modal';
+import { Track } from '../core/types/track';
+import { TrackModal } from '../components/track-modal/track-modal';
+import { SpotifyPlayerService } from '../core/services/spotify-player.service';
 
 @Component({
     selector: 'app-home',
@@ -16,9 +17,15 @@ import {TrackModal} from '../components/track-modal/track-modal';
 export class Home implements OnInit {
     tracks = signal<Track[]>([]);
     isTrackModalOpen = signal(false);
-    selectedTrack = signal<Track | null>(null);
 
-    constructor(private spotifyService: SpotifyService) {}
+    // Tracks
+    selectedTrack = signal<Track | null>(null);
+    nextTrack = signal<Track | null>(null);
+
+    constructor(
+        private readonly spotifyService: SpotifyService,
+        private readonly spotifyPlayerService: SpotifyPlayerService,
+    ) {}
 
     ngOnInit() {
         this.getUsersTopTracks();
@@ -50,10 +57,23 @@ export class Home implements OnInit {
 
     openTrackModal(track: Track) {
         this.selectedTrack.set(track);
+
+        // Find next track
+        const currentIndex = this.tracks().findIndex(t => t.id === track.id);
+        if (currentIndex !== -1 && currentIndex + 1 < this.tracks().length) {
+            this.nextTrack.set(this.tracks()[currentIndex + 1]);
+        } else {
+            this.nextTrack.set(null);
+        }
+
+        console.log('Next track:', this.nextTrack());
+
         this.isTrackModalOpen.set(true);
     }
 
     closeTrackModal() {
+        this.spotifyPlayerService.pause();
+
         this.isTrackModalOpen.set(false);
     }
 }

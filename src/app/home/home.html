@@ -38,6 +38,7 @@
 @if (isTrackModalOpen()) {
     <app-track-modal
         [track]="selectedTrack()"
+        [nextTracks]="[nextTrack()]"
         (modalClosed)="closeTrackModal()"
     ></app-track-modal>
 }
