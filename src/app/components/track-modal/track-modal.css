@@ -11,4 +11,14 @@
     align-items: center;
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(6px);
+    animation: fadeIn 0.1s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
