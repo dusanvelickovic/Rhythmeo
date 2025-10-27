@@ -39,6 +39,9 @@
     <app-track-modal
         [track]="selectedTrack()"
         [nextTracks]="[nextTrack()]"
+        [previousTracks]="[previousTrack()]"
         (modalClosed)="closeTrackModal()"
+        (nextTrackRequested)="onNextTrackRequested()"
+        (previousTrackRequested)="onPreviousTrackRequested()"
     ></app-track-modal>
 }

@@ -31,6 +31,9 @@
                 <app-spotify-player
                     [track]="track"
                     [nextTrackUri]="nextTracks.at(0)?.uri!"
+                    [previousTrackUri]="previousTracks.at(0)?.uri!"
+                    (nextTrackRequested)="onNextTrackRequested()"
+                    (previousTrackRequested)="onPreviousTrackRequested()"
                 ></app-spotify-player>
             </div>
 

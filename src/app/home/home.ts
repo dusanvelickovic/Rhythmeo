@@ -21,6 +21,8 @@ export class Home implements OnInit {
     // Tracks
     selectedTrack = signal<Track | null>(null);
     nextTrack = signal<Track | null>(null);
+    previousTrack = signal<Track | null>(null);
+    currentTrackIndex = 0;
 
     constructor(
         private readonly spotifyService: SpotifyService,
@@ -59,16 +61,63 @@ export class Home implements OnInit {
         this.selectedTrack.set(track);
 
         // Find next track
-        const currentIndex = this.tracks().findIndex(t => t.id === track.id);
-        if (currentIndex !== -1 && currentIndex + 1 < this.tracks().length) {
-            this.nextTrack.set(this.tracks()[currentIndex + 1]);
+        this.currentTrackIndex = this.tracks().findIndex(t => t.id === track.id);
+        this.updateNextAndPreviousTracks();
+
+        this.isTrackModalOpen.set(true);
+    }
+
+    /**
+     * Handle request to move to the next track
+     */
+    onNextTrackRequested() {
+        // Move to next track
+        this.currentTrackIndex++;
+
+        // Check if we have more tracks
+        if (this.currentTrackIndex < this.tracks().length) {
+            this.selectedTrack.set(this.tracks()[this.currentTrackIndex]);
+            this.updateNextAndPreviousTracks();
+        } else {
+            // No more tracks
+            this.nextTrack.set(null);
+        }
+    }
+
+    /**
+     * Handle request to move to the previous track
+     */
+    onPreviousTrackRequested() {
+        // Move to previous track
+        this.currentTrackIndex--;
+
+        // Check if we have previous tracks
+        if (this.currentTrackIndex >= 0) {
+            this.selectedTrack.set(this.tracks()[this.currentTrackIndex]);
+            this.updateNextAndPreviousTracks();
+        } else {
+            // No more previous tracks
+            this.previousTrack.set(null);
+        }
+    }
+
+    /**
+     * Update the next and previous tracks based on the current track index
+     */
+    private updateNextAndPreviousTracks() {
+        // Update next track
+        if (this.currentTrackIndex !== -1 && this.currentTrackIndex + 1 < this.tracks().length) {
+            this.nextTrack.set(this.tracks()[this.currentTrackIndex + 1]);
         } else {
             this.nextTrack.set(null);
         }
 
-        console.log('Next track:', this.nextTrack());
-
-        this.isTrackModalOpen.set(true);
+        // Update previous track
+        if (this.currentTrackIndex !== -1 && this.currentTrackIndex - 1 >= 0) {
+            this.previousTrack.set(this.tracks()[this.currentTrackIndex - 1]);
+        } else {
+            this.previousTrack.set(null);
+        }
     }
 
     closeTrackModal() {

@@ -1,4 +1,4 @@
-import {Component, Input, OnDestroy, OnInit, signal} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit, Output, EventEmitter, signal} from '@angular/core';
 import {PlayerState, SpotifyPlayerService} from '../../core/services/spotify-player.service';
 import {interval, Subject, takeUntil} from 'rxjs';
 import {Track} from '../../core/types/track';
@@ -12,6 +12,9 @@ import {Track} from '../../core/types/track';
 export class SpotifyPlayer implements OnInit, OnDestroy{
     @Input() track: Track|null = null;
     @Input() nextTrackUri: string|null = null;
+    @Input() previousTrackUri: string|null = null;
+    @Output() nextTrackRequested = new EventEmitter<void>();
+    @Output() previousTrackRequested = new EventEmitter<void>();
 
     private destroy$ = new Subject<void>();
     public showVolumeSlider = signal(false);
@@ -88,16 +91,29 @@ export class SpotifyPlayer implements OnInit, OnDestroy{
         }
     }
 
+    /**
+     * Play the next track and emit an event to request it
+     */
     async nextTrack(): Promise<void> {
         if (this.nextTrackUri) {
             await this.spotifyPlayerService.play(this.nextTrackUri);
+            this.nextTrackRequested.emit();
             return;
         }
 
         await this.spotifyPlayerService.nextTrack();
     }
 
+    /**
+     * Play the previous track and emit an event to request it
+     */
     async previousTrack(): Promise<void> {
+        if (this.previousTrackUri) {
+            await this.spotifyPlayerService.play(this.previousTrackUri);
+            this.previousTrackRequested.emit();
+            return;
+        }
+
         await this.spotifyPlayerService.previousTrack();
     }
 
