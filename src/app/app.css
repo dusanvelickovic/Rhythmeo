@@ -7,7 +7,7 @@
     height: 100vh;
     z-index: 0;
     pointer-events: none;
-    background: #191414;
+    background: #0a0a0a;
 }
 
 .animated-gradient-bg {
@@ -24,9 +24,9 @@
     left: -10vw;
     top: -10vh;
     background: linear-gradient(
-        120deg,
+        var(--gradient-angle, 120deg),
         transparent 40%,
-        rgba(29, 185, 84, 0.18) 60%,
+        rgba(29, 185, 84, 0.08) 60%,
         transparent 80%
     );
     background-size: 400% 400%;
@@ -35,7 +35,7 @@
 }
 .green-fade-2 {
     background: linear-gradient(
-        120deg,
+        var(--gradient-angle, 120deg),
         transparent 30%,
         rgba(67, 233, 123, 0.14) 55%,
         transparent 80%
@@ -44,9 +44,9 @@
 }
 .green-fade-3 {
     background: linear-gradient(
-        120deg,
+        var(--gradient-angle, 120deg),
         transparent 50%,
-        rgba(0, 201, 167, 0.12) 70%,
+        rgba(0, 201, 167, 0.05) 70%,
         transparent 90%
     );
     animation-delay: 10s;

@@ -12,7 +12,6 @@ export class SpotifyService {
     constructor(
         private readonly http: HttpService,
         private readonly authService: AuthService,
-        private readonly configService: ConfigService,
     ) {}
 
     /**
@@ -30,6 +29,28 @@ export class SpotifyService {
         };
 
         const url = `${this.spotifyApiUrl}/me/top/tracks`;
+
+        try {
+            const response = await firstValueFrom(
+                this.http.get(url, { headers }),
+            );
+            return response.data;
+        } catch (error) {
+            throw new Error(`Spotify API error: ${error.response?.data?.error?.message || error.message}`);
+        }
+    }
+
+    /**
+     * Get tracks by their Spotify IDs
+     */
+    async getTracksByIds(spotifyId: string, trackIds: string[]): Promise<any> {
+        const accessToken = await this.authService.getAccessToken(spotifyId);
+
+        const headers = {
+            Authorization: `Bearer ${accessToken}`,
+        }
+
+        const url = `${this.spotifyApiUrl}/tracks?ids=${trackIds.join(',')}`;
 
         try {
             const response = await firstValueFrom(

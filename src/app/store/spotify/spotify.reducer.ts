@@ -19,5 +19,21 @@ export const spotifyReducer = createReducer(
         ...state,
         topTracksLoading: false,
         topTracksError: error,
+    })),
+    on(SpotifyActions.loadTracks, (state) => ({
+        ...state,
+        tracksLoading: true,
+        tracksError: null,
+    })),
+    on(SpotifyActions.loadTracksSuccess, (state, { tracks }) => ({
+        ...state,
+        tracks: tracks,
+        tracksLoading: false,
+        tracksError: null,
+    })),
+    on(SpotifyActions.loadTracksFailure, (state, { error }) => ({
+        ...state,
+        tracksLoading: false,
+        tracksError: error,
     }))
 );

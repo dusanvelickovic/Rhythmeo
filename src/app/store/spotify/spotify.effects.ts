@@ -37,4 +37,22 @@ export class SpotifyEffects {
             )
         )
     );
+
+    loadTracks$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(SpotifyActions.loadTracks),
+            switchMap(({ trackIds }) =>
+                this.spotifyService.getTracks(trackIds).pipe(
+                    map((response: any) => {
+                        const tracks = response?.tracks || [];
+                        return SpotifyActions.loadTracksSuccess({ tracks });
+                    }),
+                    catchError((error) => {
+                        console.error('Failed to fetch tracks', error);
+                        return of(SpotifyActions.loadTracksFailure({ error }));
+                    })
+                )
+            )
+        )
+    );
 }

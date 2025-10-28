@@ -1,0 +1,44 @@
+<div class="p-8 max-w-[1400px] mx-auto">
+    <h1 class="text-4xl font-bold mb-8 text-white">Liked Songs</h1>
+
+    @if (isLoading()) {
+        <div class="text-center py-16 px-8 text-xl text-gray-400">Loading your liked songs...</div>
+    } @else if (tracks().length === 0) {
+        <div class="text-center py-16 px-8 text-xl text-gray-400">
+            <p>You haven't liked any songs yet.</p>
+        </div>
+    } @else {
+        <div class="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-6">
+            @for (track of tracks(); track track.id) {
+                <div class="flex flex-col items-center justify-between space-y-1 overflow-hidden">
+                    <div class="relative">
+                        <img
+                            (click)="openTrackModal(track)"
+                            [src]="track.album.images[0]?.url"
+                            [alt]="track.name"
+                            class="h-64 rounded-lg border border-emerald-950 shadow shadow-black cursor-pointer object-cover"
+                        />
+                        <div class="absolute inset-0 rounded-lg bg-gray-700 mix-blend-overlay pointer-events-none"></div>
+                    </div>
+                    <div class="w-64">
+                        <div>
+                            <h2 #trackName class="text-white text-base w-full text-center tracking-wide uppercase font-medium whitespace-nowrap" [class.animate-marquee]="checkTextOverflow(trackName)">{{ track.name }}</h2>
+                        </div>
+                        <h2 class="text-sm text-center tracking-wide text-gray-300 font-medium">{{ track.artists.at(0)?.name }}</h2>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    @if (isTrackModalOpen()) {
+        <app-track-modal
+            [track]="selectedTrack()"
+            [nextTracks]="[nextTrack()]"
+            [previousTracks]="[previousTrack()]"
+            (modalClosed)="closeTrackModal()"
+            (nextTrackRequested)="onNextTrackRequested()"
+            (previousTrackRequested)="onPreviousTrackRequested()"
+        ></app-track-modal>
+    }
+</div>

@@ -17,3 +17,18 @@ export const selectTopTracksError = createSelector(
     selectSpotifyState,
     (state: SpotifyState) => state.topTracksError
 );
+
+export const selectTracks = createSelector(
+    selectSpotifyState,
+    (state: SpotifyState) => state.tracks
+);
+
+export const selectTracksLoading = createSelector(
+    selectSpotifyState,
+    (state: SpotifyState) => state.tracksLoading
+);
+
+export const selectTracksError = createSelector(
+    selectSpotifyState,
+    (state: SpotifyState) => state.tracksError
+);

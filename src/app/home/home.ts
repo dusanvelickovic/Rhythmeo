@@ -183,6 +183,10 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
         this.isTrackModalOpen.set(false);
     }
 
+    checkTextOverflow(element: HTMLElement): boolean {
+        return element.scrollWidth > element.clientWidth;
+    }
+
     ngOnDestroy(): void {
         this.destroy$.next();
         this.destroy$.complete();

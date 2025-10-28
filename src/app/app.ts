@@ -11,6 +11,10 @@ import {SpotifyPlayerService} from './core/services/spotify-player.service';
     styleUrl: './app.css',
 })
 export class App implements OnInit, OnDestroy{
+    gradientAngle1 = Math.floor(Math.random() * 360);
+    gradientAngle2 = Math.floor(Math.random() * 360);
+    gradientAngle3 = Math.floor(Math.random() * 360);
+
     constructor(
         public authService: AuthService,
         private readonly spotifyPlayerService: SpotifyPlayerService,

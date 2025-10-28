@@ -13,4 +13,8 @@ export class SpotifyService {
     getUsersTopTracks(): Observable<any[]> {
         return this.http.get<any[]>(`${this.apiUrl}/spotify/top-tracks`);
     }
+
+    getTracks(trackIds: string[]): Observable<any> {
+        return this.http.post<any>(`${this.apiUrl}/spotify/tracks`, { trackIds });
+    }
 }

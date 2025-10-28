@@ -1,4 +1,4 @@
-import {Controller, Get, Req, UseGuards, Query} from '@nestjs/common';
+import {Controller, Get, Post, Body, Req, UseGuards, Query} from '@nestjs/common';
 import {JwtAuthGuard} from '../auth/guards/jwt-auth.guard';
 import {SpotifyService} from './spotify.service';
 import {User} from '../users/user.entity';
@@ -19,5 +19,14 @@ export class SpotifyController {
             timeRange || 'medium_term',
             limit || 20,
         );
+    }
+
+    @Post('tracks')
+    @UseGuards(JwtAuthGuard)
+    async getTracks(
+        @Req() req: any,
+        @Body() body: { trackIds: string[] },
+    ) {
+        return this.spotifyService.getTracksByIds(req.user.spotifyId, body.trackIds);
     }
 }
