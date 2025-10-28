@@ -12,6 +12,7 @@ import { routes } from './app.routes';
 import {authInterceptor} from './core/interceptors/auth.interceptor';
 import { authReducer, AuthEffects } from './store/auth';
 import { playerReducer, PlayerEffects } from './store/player';
+import { likedSongsReducer, LikedSongsEffects } from './store/liked-songs';
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -19,7 +20,7 @@ export const appConfig: ApplicationConfig = {
         provideZoneChangeDetection({ eventCoalescing: true }),
         provideRouter(routes),
         provideHttpClient(withInterceptors([authInterceptor])),
-        provideStore({ auth: authReducer, player: playerReducer }),
-        provideEffects([AuthEffects, PlayerEffects]),
+        provideStore({ auth: authReducer, player: playerReducer, likedSongs: likedSongsReducer }),
+        provideEffects([AuthEffects, PlayerEffects, LikedSongsEffects]),
     ],
 };
