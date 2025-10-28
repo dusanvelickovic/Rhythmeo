@@ -16,6 +16,8 @@ const auth_module_1 = require("./auth/auth.module");
 const users_module_1 = require("./users/users.module");
 const spotify_module_1 = require("./spotify/spotify.module");
 const liked_tracks_module_1 = require("./liked-tracks/liked-tracks.module");
+const playlist_module_1 = require("./playlist/playlist.module");
+const playlist_track_module_1 = require("./playlist-track/playlist-track.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -49,6 +51,8 @@ exports.AppModule = AppModule = __decorate([
             users_module_1.UsersModule,
             spotify_module_1.SpotifyModule,
             liked_tracks_module_1.LikedTracksModule,
+            playlist_module_1.PlaylistModule,
+            playlist_track_module_1.PlaylistTrackModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

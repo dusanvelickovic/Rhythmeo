@@ -7,6 +7,8 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { SpotifyModule } from './spotify/spotify.module';
 import { LikedTracksModule } from './liked-tracks/liked-tracks.module';
+import { PlaylistModule } from './playlist/playlist.module';
+import { PlaylistTrackModule } from './playlist-track/playlist-track.module';
 
 @Module({
     imports: [
@@ -37,6 +39,8 @@ import { LikedTracksModule } from './liked-tracks/liked-tracks.module';
         UsersModule,
         SpotifyModule,
         LikedTracksModule,
+        PlaylistModule,
+        PlaylistTrackModule,
     ],
     controllers: [AppController],
     providers: [AppService],
