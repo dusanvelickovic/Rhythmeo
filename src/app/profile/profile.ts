@@ -1,48 +1,37 @@
 import {Component, OnInit} from '@angular/core';
-import {UserService} from '../core/services/user.service';
 import {User} from '../core/types/user';
 import {AuthService} from '../core/services/auth.service';
 import {RouterLink} from '@angular/router';
+import {Store} from '@ngrx/store';
+import {Observable} from 'rxjs';
+import * as AuthSelectors from '../store/auth/auth.selectors';
+import {AsyncPipe} from '@angular/common';
+import {ExtractUrlPipe} from '../core/pipes/extract-url.pipe';
 
 @Component({
   selector: 'app-profile',
     imports: [
-        RouterLink
+        RouterLink,
+        AsyncPipe,
+        ExtractUrlPipe
     ],
   templateUrl: './profile.html',
 })
 export class Profile implements OnInit{
-    user: User | null = null;
-    loading = true;
-    error: string | null = null;
+    user$: Observable<User | null>;
+    loading$: Observable<boolean>;
+    error$: Observable<any>;
 
     constructor(
-        private userService: UserService,
         private authService: AuthService,
-    ) {}
-
-    ngOnInit() {
-        this.loadUserProfile();
+        private store: Store
+    ) {
+        this.user$ = this.store.select(AuthSelectors.selectCurrentUser);
+        this.loading$ = this.store.select(AuthSelectors.selectAuthLoading);
+        this.error$ = this.store.select(AuthSelectors.selectAuthError);
     }
 
-    /**
-     * Load the current user's profile information
-     */
-    loadUserProfile(): void {
-        this.loading = true;
-        this.error = null;
-
-        this.userService.getCurrentUser().subscribe({
-            next: (data) => {
-                this.user = data;
-                this.loading = false;
-            },
-            error: (err) => {
-                this.error = 'Failed to load user profile';
-                this.loading = false;
-                console.error('Error loading user:', err);
-            }
-        });
+    ngOnInit() {
     }
 
     /**

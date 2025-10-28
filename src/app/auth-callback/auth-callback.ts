@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
+import { Store } from '@ngrx/store';
+import { filter, take } from 'rxjs/operators';
+import * as AuthSelectors from '../store/auth/auth.selectors';
 
 @Component({
     selector: 'app-auth-callback',
@@ -40,7 +43,8 @@ export class AuthCallback implements OnInit {
     constructor(
         private route: ActivatedRoute,
         private router: Router,
-        private authService: AuthService
+        private authService: AuthService,
+        private store: Store
     ) {}
 
     ngOnInit(): void {
@@ -48,14 +52,21 @@ export class AuthCallback implements OnInit {
             const token = params['token'];
 
             if (token) {
-                this.authService.handleLoginCallback(token).subscribe({
-                    next: () => {
-                        this.router.navigate(['/home']);
-                    },
-                    error: (error) => {
-                        console.error('An error occurred: ', error);
-                        this.router.navigate(['/error']);
-                    }
+                this.authService.handleLoginCallback(token);
+                
+                this.store.select(AuthSelectors.selectAuthLoading).pipe(
+                    filter(loading => !loading),
+                    take(1)
+                ).subscribe(() => {
+                    this.store.select(AuthSelectors.selectIsAuthenticated).pipe(
+                        take(1)
+                    ).subscribe(isAuthenticated => {
+                        if (isAuthenticated) {
+                            this.router.navigate(['/home']);
+                        } else {
+                            this.router.navigate(['/error']);
+                        }
+                    });
                 });
             } else {
                 this.router.navigate(['/login']);

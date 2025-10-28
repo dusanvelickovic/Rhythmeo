@@ -8,31 +8,33 @@
         </a>
     </div>
 
-    <div class="bg-black/90 backdrop-blur-sm rounded-2xl overflow-hidden shadow-md border-1 border-emerald-950">
-        <!-- Header: avatar + basic info + logout -->
-        <div class="px-6 py-6 flex items-center gap-4">
-            @if (user?.profileImage !== null) {
-                <img
-                    src="{{ user?.profileImage }}"
-                    alt="User avatar"
-                    class="w-20 h-20 rounded-full border-1 border-emerald-950 shadow-md object-cover">
-            }
+    @if (user$ | async; as user) {
+        <div class="bg-black/90 backdrop-blur-sm rounded-2xl overflow-hidden shadow-md border-1 border-emerald-950">
+            <!-- Header: avatar + basic info + logout -->
+            <div class="px-6 py-6 flex items-center gap-4">
+                @if (user.profileImage) {
+                    <img
+                        [src]="user.profileImage | extractUrl"
+                        alt="User avatar"
+                        class="w-20 h-20 rounded-full border-1 border-emerald-950 shadow-md object-cover">
+                }
 
-            <div class="flex-1 min-w-0">
-                <h2 class="text-xl font-semibold text-emerald-100 truncate">{{ user?.displayName }}</h2>
-                <p class="text-sm text-emerald-200/80 truncate">{{ user?.email }}</p>
+                <div class="flex-1 min-w-0">
+                    <h2 class="text-xl font-semibold text-emerald-100 truncate">{{ user.displayName }}</h2>
+                    <p class="text-sm text-emerald-200/80 truncate">{{ user.email }}</p>
+                </div>
+
+                <button
+                    type="button"
+                    (click)="logout()"
+                    class="ml-2 cursor-pointer text-white inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 px-3 py-2 rounded-lg text-sm font-medium shadow-sm transition"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                    </svg>
+                    <span class="uppercase tracking-wider">Logout</span>
+                </button>
             </div>
-
-            <button
-                type="button"
-                (click)="logout()"
-                class="ml-2 cursor-pointer text-white inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 px-3 py-2 rounded-lg text-sm font-medium shadow-sm transition"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
-                </svg>
-                <span class="uppercase tracking-wider">Logout</span>
-            </button>
         </div>
-    </div>
+    }
 </div>
