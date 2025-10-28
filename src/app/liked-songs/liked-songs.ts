@@ -8,10 +8,11 @@ import { TrackModal } from '../components/track-modal/track-modal';
 import * as SpotifyActions from '../store/spotify/spotify.actions';
 import * as SpotifySelectors from '../store/spotify/spotify.selectors';
 import * as PlayerActions from '../store/player/player.actions';
+import {RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-liked-songs',
-  imports: [CommonModule, TrackModal],
+    imports: [CommonModule, TrackModal, RouterLink],
   templateUrl: './liked-songs.html',
   styleUrl: './liked-songs.css'
 })
