@@ -1,15 +1,17 @@
 import {inject, Injectable, NgZone} from '@angular/core';
 import { BehaviorSubject, Observable, fromEvent } from 'rxjs';
+import { Store } from '@ngrx/store';
 import { AuthService } from './auth.service';
 import {Track} from '../types/track';
+import * as PlayerActions from '../../store/player/player.actions';
 
 export interface PlayerState {
     paused: boolean;
     position: number;
     duration: number;
     current_track: Track | null;
-    nextTracks: [];
-    previousTracks: [];
+    nextTracks: Track[];
+    previousTracks: Track[];
 }
 
 @Injectable({
@@ -36,6 +38,7 @@ export class SpotifyPlayerService {
     constructor(
         private readonly authService: AuthService,
         private readonly ngZone: NgZone,
+        private readonly store: Store,
     ) {}
 
     /**
@@ -92,6 +95,7 @@ export class SpotifyPlayerService {
 
                         this.deviceId = device_id;
                         this.readySubject.next(true);
+                        this.store.dispatch(PlayerActions.playerReady({ deviceId: device_id }));
                         resolve();
                     });
                 });
@@ -100,6 +104,7 @@ export class SpotifyPlayerService {
                 this.player.addListener('not_ready', ({device_id}) => {
                     this.ngZone.run(() => {
                         this.readySubject.next(false);
+                        this.store.dispatch(PlayerActions.playerNotReady());
                     });
                 });
 
@@ -108,14 +113,17 @@ export class SpotifyPlayerService {
                     this.ngZone.run(() => {
                         if (!state) return;
 
-                        this.playerStateSubject.next({
+                        const playerState = {
                             paused: state.paused,
                             position: state.position,
                             duration: state.duration,
                             current_track: state.track_window.current_track,
                             nextTracks: state.track_window.next_tracks,
                             previousTracks: state.track_window.previous_tracks,
-                        });
+                        };
+
+                        this.playerStateSubject.next(playerState);
+                        this.store.dispatch(PlayerActions.updatePlayerState(playerState));
                     });
                 });
 
@@ -269,6 +277,7 @@ export class SpotifyPlayerService {
             nextTracks: [],
             previousTracks: [],
         });
+        this.store.dispatch(PlayerActions.cleanupPlayerState());
     }
 
     /**
@@ -280,6 +289,7 @@ export class SpotifyPlayerService {
             this.player = null;
             this.deviceId = null;
             this.readySubject.next(false);
+            this.store.dispatch(PlayerActions.disconnect());
         }
     }
 }

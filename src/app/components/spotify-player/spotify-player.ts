@@ -1,8 +1,11 @@
 import {Component, Input, OnDestroy, OnInit, OnChanges, SimpleChanges, Output, EventEmitter, signal} from '@angular/core';
-import {PlayerState, SpotifyPlayerService} from '../../core/services/spotify-player.service';
-import {interval, Subject, takeUntil} from 'rxjs';
+import {interval, Subject, takeUntil, Observable} from 'rxjs';
 import {Track} from '../../core/types/track';
 import {LikedSongsService} from '../../core/services/liked-songs.service';
+import { Store } from '@ngrx/store';
+import * as PlayerActions from '../../store/player/player.actions';
+import * as PlayerSelectors from '../../store/player/player.selectors';
+import { PlayerState } from '../../store/player/player.state';
 
 @Component({
   selector: 'app-spotify-player',
@@ -21,14 +24,22 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
     public showVolumeSlider = signal(false);
     public isLiked = signal(false);
 
+    playerState$!: Observable<PlayerState>;
+    isReady$!: Observable<boolean>;
+    volume$!: Observable<number>;
+
     playerState: PlayerState | null = null;
     isReady = false;
     volume = 20;
 
     constructor(
-        private spotifyPlayerService: SpotifyPlayerService,
-        private likedSongsService: LikedSongsService
-    ) {}
+        private likedSongsService: LikedSongsService,
+        private store: Store
+    ) {
+        this.playerState$ = this.store.select(PlayerSelectors.selectPlayerState);
+        this.isReady$ = this.store.select(PlayerSelectors.selectIsReady);
+        this.volume$ = this.store.select(PlayerSelectors.selectVolume);
+    }
 
     /**
      * Toggle volume slider visibility
@@ -45,24 +56,26 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
     }
 
     async ngOnInit(): Promise<void> {
-        // Subscribe to player state
-        this.spotifyPlayerService.playerState$
+        // Subscribe to player state from store
+        this.playerState$
             .pipe(takeUntil(this.destroy$))
             .subscribe((state) => {
                 this.playerState = state;
             });
 
-        // Subscribe to ready state
-        this.spotifyPlayerService.ready$
+        // Subscribe to ready state from store
+        this.isReady$
             .pipe(takeUntil(this.destroy$))
             .subscribe((ready) => {
                 this.isReady = ready;
             });
 
-        // Set playerState track
-        if (this.playerState && this.track) {
-            this.playerState.current_track = this.track;
-        }
+        // Subscribe to volume from store
+        this.volume$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((volume) => {
+                this.volume = volume;
+            });
 
         // Check if current track is liked
         if (this.track?.id) {
@@ -74,16 +87,17 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
             .pipe(takeUntil(this.destroy$))
             .subscribe(() => {
                 if (this.playerState && !this.playerState.paused) {
-                    this.playerState.position = Math.min(
+                    const newPosition = Math.min(
                         this.playerState.position + 1000,
                         this.playerState.duration
                     );
+                    this.store.dispatch(PlayerActions.updatePosition({ position: newPosition }));
                 }
             });
     }
 
     private songWasPlayed = false;
-    async togglePlay(): Promise<void> {
+    togglePlay(): void {
         try {
             // If the song was never played, play it from the beginning
             // TODO: ugly fix
@@ -92,12 +106,12 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
                 this.songWasPlayed = true;
 
                 // Play the track
-                await this.spotifyPlayerService.play(this.track?.uri);
+                this.store.dispatch(PlayerActions.play({ uri: this.track?.uri }));
                 console.log('Playing:', this.track?.name);
             }
             else {
                 // Toggle play/pause
-                await this.spotifyPlayerService.togglePlay();
+                this.store.dispatch(PlayerActions.togglePlay());
                 console.log(this.playerState?.paused ? 'Paused' : 'Playing');
             }
 
@@ -111,45 +125,45 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
     /**
      * Play the next track and emit an event to request it
      */
-    async nextTrack(): Promise<void> {
+    nextTrack(): void {
         if (this.nextTrackUri) {
-            await this.spotifyPlayerService.play(this.nextTrackUri);
+            this.store.dispatch(PlayerActions.play({ uri: this.nextTrackUri }));
             this.nextTrackRequested.emit();
             return;
         }
 
-        await this.spotifyPlayerService.nextTrack();
+        this.store.dispatch(PlayerActions.nextTrack());
     }
 
     /**
      * Play the previous track and emit an event to request it
      */
-    async previousTrack(): Promise<void> {
+    previousTrack(): void {
         if (this.previousTrackUri) {
-            await this.spotifyPlayerService.play(this.previousTrackUri);
+            this.store.dispatch(PlayerActions.play({ uri: this.previousTrackUri }));
             this.previousTrackRequested.emit();
             return;
         }
 
-        await this.spotifyPlayerService.previousTrack();
+        this.store.dispatch(PlayerActions.previousTrack());
     }
 
     /**
      * Handle seek from slider
      */
-    async onSeek(event: Event): Promise<void> {
+    onSeek(event: Event): void {
         const input = event.target as HTMLInputElement;
         const position = parseInt(input.value, 10);
-        await this.spotifyPlayerService.seek(position);
+        this.store.dispatch(PlayerActions.seek({ position }));
     }
 
     /**
      * Handle volume change from slider
      */
-    async onVolumeChange(event: Event): Promise<void> {
+    onVolumeChange(event: Event): void {
         const input = event.target as HTMLInputElement;
-        this.volume = parseInt(input.value, 10);
-        await this.spotifyPlayerService.setVolume(this.volume / 100);
+        const volume = parseInt(input.value, 10);
+        this.store.dispatch(PlayerActions.setVolume({ volume }));
     }
 
     /**
@@ -224,6 +238,6 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
     ngOnDestroy(): void {
         this.destroy$.next();
         this.destroy$.complete();
-        this.spotifyPlayerService.cleanUpPlayerState();
+        this.store.dispatch(PlayerActions.cleanupPlayerState());
     }
 }

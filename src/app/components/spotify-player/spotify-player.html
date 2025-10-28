@@ -1,4 +1,4 @@
-@if(isReady && playerState?.current_track) {
+@if(isReady && (playerState?.current_track || track)) {
     <div class="pointer-events-auto">
         <!-- Vinyl Record -->
         <div class="relative w-96 h-96 mb-4">
@@ -12,7 +12,7 @@
                 <!-- Center label -->
                 <div class="absolute inset-0 flex items-center justify-center">
                     <div class="w-32 h-32 rounded-full bg-gradient-to-br from-red-400 to-pink-600 overflow-hidden shadow-xl">
-                        <img src="{{ track?.album?.images?.at(0)?.url }}"
+                        <img src="{{ (playerState?.current_track || track)?.album?.images?.at(0)?.url }}"
                              alt="Album art"
                              class="w-full h-full object-cover opacity-90">
                     </div>
