@@ -238,6 +238,5 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
     ngOnDestroy(): void {
         this.destroy$.next();
         this.destroy$.complete();
-        this.store.dispatch(PlayerActions.cleanupPlayerState());
     }
 }
