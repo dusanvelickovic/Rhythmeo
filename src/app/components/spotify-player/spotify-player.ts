@@ -7,10 +7,11 @@ import * as PlayerSelectors from '../../store/player/player.selectors';
 import { PlayerState } from '../../store/player/player.state';
 import * as LikedTracksActions from '../../store/liked-tracks/liked-tracks.actions';
 import * as LikedTracksSelectors from '../../store/liked-tracks/liked-tracks.selectors';
+import { AddToPlaylist } from '../add-to-playlist/add-to-playlist';
 
 @Component({
   selector: 'app-spotify-player',
-  imports: [],
+  imports: [AddToPlaylist],
   templateUrl: './spotify-player.html',
   styleUrl: './spotify-player.css'
 })
@@ -23,6 +24,7 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
 
     private destroy$ = new Subject<void>();
     public showVolumeSlider = signal(false);
+    public showAddToPlaylist = signal(false);
 
     playerState$!: Observable<PlayerState>;
     isReady$!: Observable<boolean>;
@@ -212,6 +214,30 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
 
             this.store.dispatch(LikedTracksActions.likeTrack({ trackData }));
         }
+    }
+
+    /**
+     * Open add to playlist modal
+     */
+    openAddToPlaylist(): void {
+        this.showAddToPlaylist.set(true);
+    }
+
+    /**
+     * Close add to playlist modal
+     */
+    closeAddToPlaylist(): void {
+        this.showAddToPlaylist.set(false);
+    }
+
+    /**
+     * Handle adding track to playlist
+     */
+    onAddToPlaylist(playlistId: number): void {
+        console.log('Adding track to playlist:', playlistId, this.track?.id);
+        // TODO: Dispatch action to add track to playlist
+        this.closeAddToPlaylist();
+        // Show success message
     }
 
     ngOnDestroy(): void {

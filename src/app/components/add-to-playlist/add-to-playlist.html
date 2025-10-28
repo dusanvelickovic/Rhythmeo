@@ -1,0 +1,116 @@
+@if (isOpen) {
+    <!-- Backdrop -->
+    <div 
+        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 animate-in fade-in duration-200"
+        (click)="onClose()"
+    ></div>
+
+    <!-- Modal -->
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+        <div 
+            class="pointer-events-auto w-full max-w-md bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl shadow-2xl animate-in zoom-in-95 fade-in duration-200"
+            (click)="$event.stopPropagation()"
+        >
+            <!-- Header -->
+            <div class="flex items-center justify-between p-6 border-b border-gray-700">
+                <div>
+                    <h2 class="text-xl font-bold text-white">Add to Playlist</h2>
+                    @if (trackName) {
+                        <p class="text-sm text-gray-400 mt-1">{{ trackName }}</p>
+                    }
+                </div>
+                <button 
+                    (click)="onClose()"
+                    class="p-2 hover:bg-gray-700 rounded-full transition-colors group"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5 text-gray-400 group-hover:text-white">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="p-4 border-b border-gray-700">
+                <div class="relative">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-gray-400">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                    </svg>
+                    <input 
+                        type="text"
+                        placeholder="Search playlists..."
+                        class="w-full pl-10 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        [value]="searchQuery()"
+                        (input)="onSearchInput($event)"
+                    />
+                </div>
+            </div>
+
+            <!-- Playlists List -->
+            <div class="max-h-96 overflow-y-auto">
+                @if (isLoading()) {
+                    <div class="flex items-center justify-center py-12">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                    </div>
+                } @else if (filteredPlaylists.length === 0) {
+                    <div class="flex flex-col items-center justify-center py-12 px-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-12 text-gray-600 mb-3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25" />
+                        </svg>
+                        <p class="text-gray-400 text-center">No playlists found</p>
+                        <p class="text-gray-500 text-sm text-center mt-1">Create a new playlist to get started</p>
+                    </div>
+                } @else {
+                    <div class="divide-y divide-gray-700">
+                        @for (playlist of filteredPlaylists; track playlist.id) {
+                            <button
+                                (click)="onAddToPlaylist(playlist.id)"
+                                class="w-full flex items-center gap-4 p-4 hover:bg-gray-800/50 transition-colors group"
+                            >
+                                <!-- Playlist Icon/Image -->
+                                <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+                                    @if (playlist.imageUrl) {
+                                        <img [src]="playlist.imageUrl" [alt]="playlist.name" class="w-full h-full object-cover rounded-lg" />
+                                    } @else {
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6 text-white">
+                                            <path fill-rule="evenodd" d="M5.25 9a6.75 6.75 0 0 1 13.5 0v.75c0 2.123.8 4.057 2.118 5.52a.75.75 0 0 1-.297 1.206c-1.544.57-3.16.99-4.831 1.243a3.75 3.75 0 1 1-7.48 0 24.585 24.585 0 0 1-4.831-1.244.75.75 0 0 1-.298-1.205A8.217 8.217 0 0 0 5.25 9.75V9Zm4.502 8.9a2.25 2.25 0 1 0 4.496 0 25.057 25.057 0 0 1-4.496 0Z" clip-rule="evenodd" />
+                                        </svg>
+                                    }
+                                </div>
+
+                                <!-- Playlist Info -->
+                                <div class="flex-1 text-left min-w-0">
+                                    <h3 class="font-semibold text-white truncate group-hover:text-blue-400 transition-colors">
+                                        {{ playlist.name }}
+                                    </h3>
+                                    @if (playlist.description) {
+                                        <p class="text-sm text-gray-400 truncate">{{ playlist.description }}</p>
+                                    }
+                                    @if (playlist.trackCount !== undefined) {
+                                        <p class="text-xs text-gray-500 mt-0.5">{{ playlist.trackCount }} tracks</p>
+                                    }
+                                </div>
+
+                                <!-- Add Icon -->
+                                <div class="flex-shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5 text-gray-400 group-hover:text-white transition-colors">
+                                        <path fill-rule="evenodd" d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                            </button>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- Footer with Create New Playlist Button -->
+            <div class="p-4 border-t border-gray-700">
+                <button class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors group">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5 text-white">
+                        <path fill-rule="evenodd" d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="font-semibold text-white">Create New Playlist</span>
+                </button>
+            </div>
+        </div>
+    </div>
+}

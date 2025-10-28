@@ -24,66 +24,83 @@
             <div class="absolute top-0 left-1/2 w-3 h-3 bg-gray-500 rounded-full transform -translate-x-1/2"></div>
         </div>
 
-        <div class="flex justify-between items-center">
-            <!-- Like Button -->
-            <button
-                (click)="toggleLike()"
-                class="group flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 hover:scale-105 mt-2"
-                [class]="isLiked ? 'bg-red-500/20 hover:bg-red-500/30' : 'bg-gray-800/50 hover:bg-gray-700/50'"
-            >
-                @if (isLiked) {
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5 text-red-500 transition-transform group-hover:scale-110">
-                        <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" />
-                    </svg>
-                } @else {
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 text-gray-400 transition-transform group-hover:scale-110 group-hover:text-white">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                    </svg>
-                }
-            </button>
-
-            <!-- Controls -->
-            <div class="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 mt-4">
-                <!-- Go to previous track -->
+        <!-- Controls Section -->
+        <div class="w-full space-y-4">
+            <!-- Main Playback Controls -->
+            <div class="flex items-center justify-center gap-4">
+                <!-- Previous Track -->
                 <button
                     (click)="previousTrack()"
-                    class="group p-3 rounded-full bg-gray-800/50 hover:bg-gray-700/50 transition-all duration-300 hover:scale-110"
+                    class="group p-3 rounded-full bg-gray-800/50 hover:bg-gray-700/50 transition-all duration-300 hover:scale-110 cursor-pointer"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5 text-gray-400 group-hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6 text-gray-400 group-hover:text-white transition-colors">
                         <path d="M9.195 18.44c1.25.714 2.805-.189 2.805-1.629v-2.34l6.945 3.968c1.25.715 2.805-.188 2.805-1.628V8.69c0-1.44-1.555-2.343-2.805-1.628L12 11.029v-2.34c0-1.44-1.555-2.343-2.805-1.628l-7.108 4.061c-1.26.72-1.26 2.536 0 3.256l7.108 4.061Z" />
                     </svg>
                 </button>
 
-                <!-- Play/Pause button -->
+                <!-- Play/Pause Button -->
                 <button
                     (click)="togglePlay()"
-                    class="group p-4 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 hover:scale-110 backdrop-blur-sm shadow-lg"
+                    class="group p-3 rounded-full bg-gradient-to-br from-white/90 to-gray-100 hover:from-white hover:to-gray-50 transition-all duration-300 hover:scale-110 shadow-xl shadow-black/20 cursor-pointer"
                 >
                     @if(playerState?.paused) {
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6 text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-7 text-gray-900">
                             <path fill-rule="evenodd" d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clip-rule="evenodd" />
                         </svg>
                     } @else {
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6 text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-7 text-gray-900">
                             <path fill-rule="evenodd" d="M6.75 5.25a.75.75 0 0 1 .75-.75H9a.75.75 0 0 1 .75.75v13.5a.75.75 0 0 1-.75.75H7.5a.75.75 0 0 1-.75-.75V5.25Zm7.5 0A.75.75 0 0 1 15 4.5h1.5a.75.75 0 0 1 .75.75v13.5a.75.75 0 0 1-.75.75H15a.75.75 0 0 1-.75-.75V5.25Z" clip-rule="evenodd" />
                         </svg>
                     }
                 </button>
 
-                <!-- Go to next track -->
+                <!-- Next Track -->
                 <button
                     (click)="nextTrack()"
-                    class="group p-3 rounded-full bg-gray-800/50 hover:bg-gray-700/50 transition-all duration-300 hover:scale-110"
+                    class="group p-3 rounded-full bg-gray-800/50 hover:bg-gray-700/50 transition-all duration-300 hover:scale-110 cursor-pointer"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5 text-gray-400 group-hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6 text-gray-400 group-hover:text-white transition-colors">
                         <path d="M5.055 7.06C3.805 6.347 2.25 7.25 2.25 8.69v8.122c0 1.44 1.555 2.343 2.805 1.628L12 14.471v2.34c0 1.44 1.555 2.343 2.805 1.628l7.108-4.061c1.26-.72 1.26-2.536 0-3.256l-7.108-4.061C13.555 6.346 12 7.249 12 8.689v2.34L5.055 7.061Z" />
                     </svg>
                 </button>
             </div>
-            <!-- Volume Control -->
-            <div class="relative mt-2">
-                <div class="flex items-center gap-3 px-4 py-2 bg-gray-800/50 rounded-full hover:bg-gray-700/50 transition-all duration-300">
-                    <button (click)="toggleVolumeSlider()" class="group">
+
+            <!-- Action Buttons Row -->
+            <div class="flex items-center justify-center gap-3">
+                <!-- Like Button -->
+                <button
+                    (click)="toggleLike()"
+                    class="group flex items-center gap-2 px-4 py-2.5 rounded-full transition-all duration-300 hover:scale-105 cursor-pointer"
+                    [class]="isLiked ? 'bg-red-500/20 hover:bg-red-500/30 border border-red-500/50' : 'bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700'"
+                >
+                    @if (isLiked) {
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5 text-red-500 transition-transform group-hover:scale-110">
+                            <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" />
+                        </svg>
+                    } @else {
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 text-gray-400 transition-transform group-hover:scale-110 group-hover:text-white">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                        </svg>
+                    }
+                </button>
+
+                <!-- Add to Playlist Button -->
+                <button
+                    (click)="openAddToPlaylist()"
+                    class="group flex items-center gap-2 px-4 py-2.5 rounded-full bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700 transition-all duration-300 hover:scale-105 cursor-pointer"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 text-gray-400 transition-transform group-hover:scale-110 group-hover:text-white">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    <span class="text-sm font-medium text-gray-400 group-hover:text-white transition-colors">Add to Playlist</span>
+                </button>
+
+                <!-- Volume Control -->
+                <div class="relative">
+                    <button
+                        (click)="toggleVolumeSlider()"
+                        class="group flex items-center gap-2 px-4 py-2.5 rounded-full bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700 transition-all duration-300 hover:scale-105 cursor-pointer"
+                    >
                         @if (volume !== 0) {
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -105,22 +122,23 @@
                             </svg>
                         }
                     </button>
-                </div>
 
-                @if(showVolumeSlider()) {
-                    <div class="absolute bottom-full mb-2 right-0 flex flex-col items-center gap-2 px-3 py-4 bg-gray-800/95 rounded-2xl shadow-xl backdrop-blur-sm animate-in fade-in slide-in-from-bottom-2 duration-200 w-[3.25rem]">
-                        <span class="text-xs font-medium text-gray-400">{{ volume }}%</span>
-                        <input
-                            type="range"
-                            orient="vertical"
-                            class="h-24 accent-white bg-gray-600 rounded-lg appearance-none cursor-pointer slider-vertical"
-                            [value]="volume"
-                            min="0"
-                            max="100"
-                            (input)="onVolumeChange($event)"
-                        />
-                    </div>
-                }
+                    @if(showVolumeSlider()) {
+                        <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 px-3 py-4 bg-gray-800/95 rounded-2xl shadow-xl backdrop-blur-sm animate-in fade-in slide-in-from-bottom-2 duration-200 border border-gray-700">
+                            <span class="text-xs font-medium text-gray-400">Volume</span>
+                            <input
+                                type="range"
+                                orient="vertical"
+                                class="h-24 accent-blue-500 bg-gray-600 rounded-lg appearance-none cursor-pointer slider-vertical"
+                                [value]="volume"
+                                min="0"
+                                max="100"
+                                (input)="onVolumeChange($event)"
+                            />
+                            <span class="text-xs font-bold text-white">{{ volume }}%</span>
+                        </div>
+                    }
+                </div>
             </div>
         </div>
 
@@ -136,5 +154,14 @@
             />
             <span class="text-xs text-gray-400 w-10 text-left">{{ formatTime(playerState?.duration ?? 0) }}</span>
         </div>
+
+        <!-- Add to Playlist Modal -->
+        <app-add-to-playlist
+            [isOpen]="showAddToPlaylist()"
+            [trackId]="track?.id || playerState?.current_track?.id || null"
+            [trackName]="track?.name || playerState?.current_track?.name || null"
+            (close)="closeAddToPlaylist()"
+            (addToPlaylist)="onAddToPlaylist($event)"
+        ></app-add-to-playlist>
     </div>
 }
