@@ -1,4 +1,4 @@
-<div class="p-8 max-w-[1400px] mx-auto">
+<div class="max-w-7xl mx-auto py-8">
     @if (isLoading()) {
         <div class="text-center py-16 px-8 text-xl text-gray-400">Loading your liked songs...</div>
     } @else if (tracks().length === 0) {
@@ -20,7 +20,7 @@
             </div>
         </div>
     } @else {
-        <div class="w-full flex justify-between items-center">
+        <div class="w-full flex justify-between items-start">
             <h1 class="text-3xl font-bold mb-8 text-white">Liked Songs</h1>
             <a routerLink="/home"
                class="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-emerald-700 border-none px-5 py-2 rounded-xl text-sm font-semibold text-white uppercase tracking-wider shadow-lg transition-all duration-200 hover:scale-105 hover:from-emerald-600 hover:to-emerald-800"
