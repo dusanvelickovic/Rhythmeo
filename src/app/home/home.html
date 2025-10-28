@@ -7,34 +7,46 @@
     </svg>
 </div>
 
+<!-- Loading indicator -->
+@if (isLoading()) {
+    <div class="w-full mx-auto min-h-auto text-white absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
+        <div class="flex flex-col items-center space-y-4">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white"></div>
+            <p class="text-lg">Loading your top tracks...</p>
+        </div>
+    </div>
+}
+
 <!-- Tracks swiper -->
-<div class="w-full mx-auto min-h-auto text-white absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
-    <swiper-container
-        #swiperContainer
-        loop="true"
-        navigation="false"
-        slides-per-view="7"
-        space-between="20"
-    >
-        @for (track of tracks(); track track.id) {
-            <swiper-slide>
-                <div class="h-72 flex flex-col items-center justify-between space-y-1">
-                    <div class="relative ">
-                        <img
-                            (click)="openTrackModal(track)"
-                            src="{{ track.album.images.at(0)?.url }}"
-                            class="h-64 rounded-lg border border-emerald-950 shadow shadow-black cursor-pointer object-cover"
-                        />
-                        <div class="absolute inset-0 rounded-lg bg-gray-700 mix-blend-overlay pointer-events-none"></div>
+@if (!isLoading()) {
+    <div class="w-full mx-auto min-h-auto text-white absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        <swiper-container
+            #swiperContainer
+            loop="true"
+            navigation="false"
+            slides-per-view="7"
+            space-between="20"
+        >
+            @for (track of tracks(); track track.id) {
+                <swiper-slide>
+                    <div class="h-72 flex flex-col items-center justify-between space-y-1">
+                        <div class="relative ">
+                            <img
+                                (click)="openTrackModal(track)"
+                                src="{{ track.album.images.at(0)?.url }}"
+                                class="h-64 rounded-lg border border-emerald-950 shadow shadow-black cursor-pointer object-cover"
+                            />
+                            <div class="absolute inset-0 rounded-lg bg-gray-700 mix-blend-overlay pointer-events-none"></div>
+                        </div>
+                        <h2 class="text-base tracking-wide uppercase font-medium ">{{ track.name }}</h2>
                     </div>
-                    <h2 class="text-base tracking-wide uppercase font-medium ">{{ track.name }}</h2>
-                </div>
-            </swiper-slide>
-        } @empty {
-            <p>No tracks found</p>
-        }
-    </swiper-container>
-</div>
+                </swiper-slide>
+            } @empty {
+                <p>No tracks found</p>
+            }
+        </swiper-container>
+    </div>
+}
 
 @if (isTrackModalOpen()) {
     <app-track-modal

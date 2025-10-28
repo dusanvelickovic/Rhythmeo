@@ -1,10 +1,13 @@
 // file: `src/app/home/home.ts`
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, signal, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
-import { SpotifyService } from '../core/services/spotify.service';
+import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, signal, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { Track } from '../core/types/track';
 import { TrackModal } from '../components/track-modal/track-modal';
-import { SpotifyPlayerService } from '../core/services/spotify-player.service';
+import { Store } from '@ngrx/store';
+import * as PlayerActions from '../store/player/player.actions';
+import * as SpotifyActions from '../store/spotify/spotify.actions';
+import * as SpotifySelectors from '../store/spotify/spotify.selectors';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'app-home',
@@ -14,10 +17,12 @@ import { SpotifyPlayerService } from '../core/services/spotify-player.service';
     styleUrls: ['./home.css'],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class Home implements OnInit, AfterViewInit {
+export class Home implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('swiperContainer', { read: ElementRef }) swiperContainer?: ElementRef;
 
+    private destroy$ = new Subject<void>();
     tracks = signal<Track[]>([]);
+    isLoading = signal(false);
     isTrackModalOpen = signal(false);
 
     // Tracks
@@ -28,12 +33,23 @@ export class Home implements OnInit, AfterViewInit {
     initialTrackIndex = 0; // Store the initial track index when modal opens
 
     constructor(
-        private readonly spotifyService: SpotifyService,
-        private readonly spotifyPlayerService: SpotifyPlayerService,
+        private readonly store: Store,
     ) {}
 
     ngOnInit() {
-        this.getUsersTopTracks();
+        this.store.dispatch(SpotifyActions.loadTopTracks());
+
+        this.store.select(SpotifySelectors.selectTopTracks)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(tracks => {
+                this.tracks.set(tracks);
+            });
+
+        this.store.select(SpotifySelectors.selectTopTracksLoading)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(loading => {
+                this.isLoading.set(loading);
+            });
     }
 
     ngAfterViewInit() {
@@ -53,30 +69,6 @@ export class Home implements OnInit, AfterViewInit {
 
     private getSwiperElement() {
         return this.swiperContainer?.nativeElement || document.querySelector('swiper-container');
-    }
-
-    /**
-     * Fetch the user's top tracks from Spotify and update the signal
-     */
-    getUsersTopTracks() {
-        this.spotifyService.getUsersTopTracks().subscribe({
-            next: (response: any) => {
-                const source =
-                    Array.isArray(response) ? response :
-                    Array.isArray(response?.items) ? response.items :
-                    Array.isArray(response?.tracks?.items) ? response.tracks.items :
-                    [];
-
-                if (source.length === 0) {
-                    console.warn('Unexpected top-tracks response shape', response);
-                }
-
-                this.tracks.set(
-                    source.map((item: any) => ({ ...item }))
-                );
-            },
-            error: (err: any) => console.error('Failed to fetch top tracks', err),
-        });
     }
 
     /**
@@ -186,8 +178,13 @@ export class Home implements OnInit, AfterViewInit {
     }
 
     closeTrackModal() {
-        this.spotifyPlayerService.pause();
+        this.store.dispatch(PlayerActions.pause());
 
         this.isTrackModalOpen.set(false);
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 }
