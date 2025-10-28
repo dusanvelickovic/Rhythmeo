@@ -29,8 +29,8 @@ let AuthController = class AuthController {
     }
     async spotifyAuthRedirect(req, res) {
         const { accessToken, refreshToken, profile: user } = req.user;
-        await this.authService.saveUserInfo(accessToken, refreshToken, user);
-        const jwt = this.authService.login(user);
+        const dbUser = await this.authService.saveUserInfo(accessToken, refreshToken, user);
+        const jwt = this.authService.login(user, dbUser.id);
         return res.redirect(`${this.frontendUrl}/login-callback?token=${jwt}`);
     }
     async getSpotifyToken(req) {

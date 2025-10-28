@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-export interface LikeSongDto {
+export interface LikeTrackDto {
     trackId: string;
     trackName: string;
     artistName?: string;
@@ -10,7 +10,7 @@ export interface LikeSongDto {
     imageUrl?: string;
 }
 
-export interface LikedSong {
+export interface LikedTrack {
     id: number;
     userId: string;
     trackId: string;
@@ -24,30 +24,30 @@ export interface LikedSong {
 @Injectable({
     providedIn: 'root'
 })
-export class LikedSongsService {
-    private apiUrl = 'http://localhost:3000/liked-songs';
+export class LikedTracksService {
+    private apiUrl = 'http://localhost:3000/liked-tracks';
 
     constructor(private http: HttpClient) {}
 
     /**
-     * Like a song
+     * Like a track
      */
-    likeSong(songData: LikeSongDto): Observable<LikedSong> {
-        return this.http.post<LikedSong>(this.apiUrl, songData);
+    likeTrack(trackData: LikeTrackDto): Observable<LikedTrack> {
+        return this.http.post<LikedTrack>(this.apiUrl, trackData);
     }
 
     /**
-     * Unlike a song by its track ID
+     * Unlike a track by its track ID
      */
-    unlikeSong(trackId: string): Observable<{ success: boolean }> {
+    unlikeTrack(trackId: string): Observable<{ success: boolean }> {
         return this.http.delete<{ success: boolean }>(`${this.apiUrl}/${trackId}`);
     }
 
     /**
-     * Get all liked songs for the current user
+     * Get all liked tracks for the current user
      */
-    getUserLikedSongs(): Observable<LikedSong[]> {
-        return this.http.get<LikedSong[]>(this.apiUrl);
+    getUserLikedTracks(): Observable<LikedTrack[]> {
+        return this.http.get<LikedTrack[]>(this.apiUrl);
     }
 
     /**

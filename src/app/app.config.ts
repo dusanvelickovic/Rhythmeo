@@ -12,7 +12,7 @@ import { routes } from './app.routes';
 import {authInterceptor} from './core/interceptors/auth.interceptor';
 import { authReducer, AuthEffects } from './store/auth';
 import { playerReducer, PlayerEffects } from './store/player';
-import { likedSongsReducer, LikedSongsEffects } from './store/liked-songs';
+import { likedTracksReducer, LikedTracksEffects } from './store/liked-tracks';
 import { spotifyReducer, SpotifyEffects } from './store/spotify';
 
 export const appConfig: ApplicationConfig = {
@@ -21,7 +21,7 @@ export const appConfig: ApplicationConfig = {
         provideZoneChangeDetection({ eventCoalescing: true }),
         provideRouter(routes),
         provideHttpClient(withInterceptors([authInterceptor])),
-        provideStore({ auth: authReducer, player: playerReducer, likedSongs: likedSongsReducer, spotify: spotifyReducer }),
-        provideEffects([AuthEffects, PlayerEffects, LikedSongsEffects, SpotifyEffects]),
+        provideStore({ auth: authReducer, player: playerReducer, likedTracks: likedTracksReducer, spotify: spotifyReducer }),
+        provideEffects([AuthEffects, PlayerEffects, LikedTracksEffects, SpotifyEffects]),
     ],
 };

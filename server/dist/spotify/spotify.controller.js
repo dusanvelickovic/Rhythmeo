@@ -23,6 +23,9 @@ let SpotifyController = class SpotifyController {
     async getUsersTopTracks(req, timeRange, limit) {
         return this.spotifyService.getUsersTopTracks(req.user.spotifyId, timeRange || 'medium_term', limit || 20);
     }
+    async getTracks(req, body) {
+        return this.spotifyService.getTracksByIds(req.user.spotifyId, body.trackIds);
+    }
 };
 exports.SpotifyController = SpotifyController;
 __decorate([
@@ -35,6 +38,15 @@ __decorate([
     __metadata("design:paramtypes", [Object, String, Number]),
     __metadata("design:returntype", Promise)
 ], SpotifyController.prototype, "getUsersTopTracks", null);
+__decorate([
+    (0, common_1.Post)('tracks'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], SpotifyController.prototype, "getTracks", null);
 exports.SpotifyController = SpotifyController = __decorate([
     (0, common_1.Controller)('spotify'),
     __metadata("design:paramtypes", [spotify_service_1.SpotifyService])

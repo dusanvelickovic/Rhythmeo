@@ -14,12 +14,10 @@ const common_1 = require("@nestjs/common");
 const axios_1 = require("@nestjs/axios");
 const rxjs_1 = require("rxjs");
 const auth_service_1 = require("../auth/auth.service");
-const config_1 = require("@nestjs/config");
 let SpotifyService = class SpotifyService {
-    constructor(http, authService, configService) {
+    constructor(http, authService) {
         this.http = http;
         this.authService = authService;
-        this.configService = configService;
         this.spotifyApiUrl = 'https://api.spotify.com/v1';
     }
     async getUsersTopTracks(spotifyId, timeRange = 'medium_term', limit = 20) {
@@ -36,12 +34,25 @@ let SpotifyService = class SpotifyService {
             throw new Error(`Spotify API error: ${error.response?.data?.error?.message || error.message}`);
         }
     }
+    async getTracksByIds(spotifyId, trackIds) {
+        const accessToken = await this.authService.getAccessToken(spotifyId);
+        const headers = {
+            Authorization: `Bearer ${accessToken}`,
+        };
+        const url = `${this.spotifyApiUrl}/tracks?ids=${trackIds.join(',')}`;
+        try {
+            const response = await (0, rxjs_1.firstValueFrom)(this.http.get(url, { headers }));
+            return response.data;
+        }
+        catch (error) {
+            throw new Error(`Spotify API error: ${error.response?.data?.error?.message || error.message}`);
+        }
+    }
 };
 exports.SpotifyService = SpotifyService;
 exports.SpotifyService = SpotifyService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [axios_1.HttpService,
-        auth_service_1.AuthService,
-        config_1.ConfigService])
+        auth_service_1.AuthService])
 ], SpotifyService);
 //# sourceMappingURL=spotify.service.js.map

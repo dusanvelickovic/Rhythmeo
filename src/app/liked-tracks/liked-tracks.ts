@@ -11,12 +11,12 @@ import * as PlayerActions from '../store/player/player.actions';
 import {RouterLink} from '@angular/router';
 
 @Component({
-  selector: 'app-liked-songs',
+  selector: 'app-liked-tracks',
     imports: [CommonModule, TrackModal, RouterLink],
-  templateUrl: './liked-songs.html',
-  styleUrl: './liked-songs.css'
+  templateUrl: './liked-tracks.html',
+  styleUrl: './liked-tracks.css'
 })
-export class LikedSongs implements OnInit, OnDestroy {
+export class LikedTracks implements OnInit, OnDestroy {
     private destroy$ = new Subject<void>();
     private apiUrl = 'http://localhost:3000';
 
@@ -34,7 +34,7 @@ export class LikedSongs implements OnInit, OnDestroy {
     ) {}
 
     ngOnInit() {
-        this.loadLikedSongs();
+        this.loadLikedTracks();
 
         this.store.select(SpotifySelectors.selectTracks)
             .pipe(takeUntil(this.destroy$))
@@ -50,13 +50,13 @@ export class LikedSongs implements OnInit, OnDestroy {
             });
     }
 
-    loadLikedSongs() {
+    loadLikedTracks() {
         this.isLoading.set(true);
-        this.http.get<any[]>(`${this.apiUrl}/liked-songs`)
+        this.http.get<any[]>(`${this.apiUrl}/liked-tracks`)
             .pipe(takeUntil(this.destroy$))
             .subscribe({
-                next: (likedSongs) => {
-                    const trackIds = likedSongs.map(song => song.trackId);
+                next: (likedTracks) => {
+                    const trackIds = likedTracks.map(track => track.trackId);
                     if (trackIds.length > 0) {
                         this.store.dispatch(SpotifyActions.loadTracks({ trackIds }));
                     } else {
@@ -64,7 +64,7 @@ export class LikedSongs implements OnInit, OnDestroy {
                     }
                 },
                 error: (error) => {
-                    console.error('Failed to fetch liked songs', error);
+                    console.error('Failed to fetch liked tracks', error);
                     this.isLoading.set(false);
                 }
             });

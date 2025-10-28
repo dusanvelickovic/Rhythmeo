@@ -15,7 +15,7 @@ const config_1 = require("@nestjs/config");
 const auth_module_1 = require("./auth/auth.module");
 const users_module_1 = require("./users/users.module");
 const spotify_module_1 = require("./spotify/spotify.module");
-const liked_songs_module_1 = require("./liked-songs/liked-songs.module");
+const liked_tracks_module_1 = require("./liked-tracks/liked-tracks.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -48,7 +48,7 @@ exports.AppModule = AppModule = __decorate([
             auth_module_1.AuthModule,
             users_module_1.UsersModule,
             spotify_module_1.SpotifyModule,
-            liked_songs_module_1.LikedSongsModule,
+            liked_tracks_module_1.LikedTracksModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

@@ -5,8 +5,8 @@ import { Store } from '@ngrx/store';
 import * as PlayerActions from '../../store/player/player.actions';
 import * as PlayerSelectors from '../../store/player/player.selectors';
 import { PlayerState } from '../../store/player/player.state';
-import * as LikedSongsActions from '../../store/liked-songs/liked-songs.actions';
-import * as LikedSongsSelectors from '../../store/liked-songs/liked-songs.selectors';
+import * as LikedTracksActions from '../../store/liked-tracks/liked-tracks.actions';
+import * as LikedTracksSelectors from '../../store/liked-tracks/liked-tracks.selectors';
 
 @Component({
   selector: 'app-spotify-player',
@@ -55,8 +55,8 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
     }
 
     async ngOnInit(): Promise<void> {
-        // Load liked songs on init
-        this.store.dispatch(LikedSongsActions.loadLikedSongs());
+        // Load liked tracks on init
+        this.store.dispatch(LikedTracksActions.loadLikedTracks());
 
         // Subscribe to player state from store
         this.playerState$
@@ -184,7 +184,7 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
     private updateLikedStatusObservable(): void {
         if (!this.track?.id) return;
 
-        this.isLiked$ = this.store.select(LikedSongsSelectors.selectIsTrackLiked(this.track.id));
+        this.isLiked$ = this.store.select(LikedTracksSelectors.selectIsTrackLiked(this.track.id));
         
         this.isLiked$
             .pipe(takeUntil(this.destroy$))
@@ -200,9 +200,9 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
         if (!this.track) return;
 
         if (this.isLiked) {
-            this.store.dispatch(LikedSongsActions.unlikeSong({ trackId: this.track.id }));
+            this.store.dispatch(LikedTracksActions.unlikeTrack({ trackId: this.track.id }));
         } else {
-            const songData = {
+            const trackData = {
                 trackId: this.track.id,
                 trackName: this.track.name,
                 artistName: this.track.artists?.[0]?.name,
@@ -210,7 +210,7 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
                 imageUrl: this.track.album?.images?.[0]?.url
             };
 
-            this.store.dispatch(LikedSongsActions.likeSong({ songData }));
+            this.store.dispatch(LikedTracksActions.likeTrack({ trackData }));
         }
     }
 

@@ -59,10 +59,11 @@ let AuthService = class AuthService {
         }
         return await this.userRepository.save(user);
     }
-    login(user) {
+    login(user, dbUserId) {
         const payload = {
             name: user.username,
             spotifyId: user.id,
+            id: dbUserId,
         };
         return this.jwtService.sign(payload);
     }

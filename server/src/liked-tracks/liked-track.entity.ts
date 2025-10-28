@@ -1,8 +1,8 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { User } from '../users/user.entity';
 
-@Entity('liked_songs')
-export class LikedSong {
+@Entity('liked_tracks')
+export class LikedTrack {
     @PrimaryGeneratedColumn()
     id!: number;
 

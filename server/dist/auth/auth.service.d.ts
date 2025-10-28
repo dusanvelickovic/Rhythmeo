@@ -12,7 +12,7 @@ export declare class AuthService {
     constructor(jwtService: JwtService, userRepository: Repository<User>, configService: ConfigService, http: HttpService);
     getUserBySpotifyId(spotifyId: string): Promise<User | undefined>;
     saveUserInfo(accessToken: string, refreshToken: string, profile: Profile): Promise<User>;
-    login(user: Profile): string;
+    login(user: Profile, dbUserId: string): string;
     getAccessToken(spotifyId: string): Promise<string | null>;
     getRefreshToken(spotifyId: string): Promise<string | null>;
     updateAccessToken(spotifyId: string, newAccessToken: string): Promise<void>;
