@@ -10,7 +10,6 @@ import { Subject, takeUntil } from 'rxjs';
 export interface Playlist {
     id: number;
     name: string;
-    description?: string;
     imageUrl?: string;
     trackCount?: number;
 }
@@ -25,6 +24,7 @@ export class AddToPlaylist implements OnInit, OnChanges, OnDestroy {
     private store = inject(Store);
     private actions$ = inject(Actions);
     private destroy$ = new Subject<void>();
+    private pendingPlaylistId: number | null = null;
 
     @Input() isOpen = false;
     @Input() trackId: string | null = null;
@@ -43,7 +43,8 @@ export class AddToPlaylist implements OnInit, OnChanges, OnDestroy {
         this.store.select(selectAllPlaylists)
             .pipe(takeUntil(this.destroy$))
             .subscribe(playlists => {
-                this.playlists.set(playlists as Playlist[]);
+                // Create a new array reference to ensure signal detects the change
+                this.playlists.set([...playlists] as Playlist[]);
             });
 
         this.store.select(selectPlaylistsLoading)
@@ -51,8 +52,38 @@ export class AddToPlaylist implements OnInit, OnChanges, OnDestroy {
             .subscribe(loading => {
                 this.isLoading.set(loading);
             });
+
+        // Subscribe to add track success once
+        this.actions$.pipe(
+            ofType(PlaylistActions.addTrackToPlaylistSuccess),
+            takeUntil(this.destroy$)
+        ).subscribe((action) => {
+            // Only react if this component initiated the action
+            if (this.pendingPlaylistId === action.playlistId && this.trackId === action.trackId) {
+                this.addToPlaylist.emit(action.playlistId);
+                this.pendingPlaylistId = null;
+                this.onClose();
+            }
+        });
+
+        // Subscribe to create playlist success once
+        this.actions$.pipe(
+            ofType(PlaylistActions.createPlaylistSuccess),
+            takeUntil(this.destroy$)
+        ).subscribe(({ playlist }) => {
+            this.showCreateForm.set(false);
+            this.newPlaylistName.set('');
+
+            // If trackId is set, add the track to the newly created playlist
+            if (this.trackId) {
+                this.onAddToPlaylist(playlist.id);
+            }
+        });
     }
 
+    /**
+     * Detect changes to isOpen input
+     */
     ngOnChanges(changes: SimpleChanges): void {
         // Load playlists when modal is opened
         if (changes['isOpen'] && changes['isOpen'].currentValue === true) {
@@ -73,27 +104,21 @@ export class AddToPlaylist implements OnInit, OnChanges, OnDestroy {
 
     onAddToPlaylist(playlistId: number): void {
         if (!this.trackId) return;
-        
+
+        this.pendingPlaylistId = playlistId;
         this.store.dispatch(addTrackToPlaylist({ playlistId, trackId: this.trackId }));
-        
-        // Listen for success action
-        this.actions$.pipe(
-            ofType(PlaylistActions.addTrackToPlaylistSuccess),
-            takeUntil(this.destroy$)
-        ).subscribe(() => {
-            this.addToPlaylist.emit(playlistId);
-            this.onClose();
-        });
     }
 
+    /**
+     * Get filtered playlists based on search query
+     */
     get filteredPlaylists(): Playlist[] {
         const query = this.searchQuery().toLowerCase();
         if (!query) {
             return this.playlists();
         }
-        return this.playlists().filter(p => 
-            p.name.toLowerCase().includes(query) || 
-            p.description?.toLowerCase().includes(query)
+        return this.playlists().filter(p =>
+            p.name.toLowerCase().includes(query)
         );
     }
 
@@ -116,20 +141,6 @@ export class AddToPlaylist implements OnInit, OnChanges, OnDestroy {
         if (!name) return;
 
         this.store.dispatch(createPlaylist({ playlistData: { name } }));
-        
-        // Listen for success action
-        this.actions$.pipe(
-            ofType(PlaylistActions.createPlaylistSuccess),
-            takeUntil(this.destroy$)
-        ).subscribe(({ playlist }) => {
-            this.showCreateForm.set(false);
-            this.newPlaylistName.set('');
-            
-            // If trackId is set, add the track to the newly created playlist
-            if (this.trackId) {
-                this.onAddToPlaylist(playlist.id);
-            }
-        });
     }
 
     onPlaylistNameInput(event: Event): void {

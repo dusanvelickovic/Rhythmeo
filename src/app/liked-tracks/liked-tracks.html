@@ -20,7 +20,7 @@
             </div>
         </div>
     } @else {
-        <div class="w-full flex justify-between items-start">
+        <div class="w-full flex justify-between items-center">
             <h1 class="text-3xl font-bold mb-8 text-white">Liked Songs</h1>
             <a routerLink="/home"
                class="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-emerald-700 border-none px-5 py-2 rounded-xl text-sm font-semibold text-white uppercase tracking-wider shadow-lg transition-all duration-200 hover:scale-105 hover:from-emerald-600 hover:to-emerald-800"
@@ -46,7 +46,7 @@
                     </div>
                     <div class="w-64">
                         <div>
-                            <h2 #trackName class="text-white text-base w-full text-center tracking-wide uppercase font-medium whitespace-nowrap" [class.animate-marquee]="checkTextOverflow(trackName)">{{ track.name }}</h2>
+                            <h2 [attr.data-track-id]="track.id" data-track-name class="text-white text-base w-full text-center tracking-wide uppercase font-medium whitespace-nowrap" [class.animate-marquee]="checkTextOverflow(track.id)">{{ track.name }}</h2>
                         </div>
                         <h2 class="text-sm text-center tracking-wide text-gray-300 font-medium">{{ track.artists.at(0)?.name }}</h2>
                     </div>

@@ -22,11 +22,31 @@ export class PlaylistService {
     /**
      * Get all playlists for a specific user
      */
-    async getUserPlaylists(userId: string): Promise<Playlist[]> {
-        return this.playlistRepository.find({
-            where: { userId },
-            order: { createdAt: 'DESC' }
-        });
+    async getUserPlaylists(userId: string): Promise<any[]> {
+        const playlists = await this.playlistRepository
+            .createQueryBuilder('playlist')
+            .leftJoin('playlist_tracks', 'track', 'track.playlistId = playlist.id')
+            .where('playlist.userId = :userId', { userId })
+            .select([
+                'playlist.id',
+                'playlist.userId',
+                'playlist.name',
+                'playlist.createdAt',
+                'playlist.updatedAt',
+                'COUNT(track.id) as trackCount'
+            ])
+            .groupBy('playlist.id')
+            .orderBy('playlist.createdAt', 'DESC')
+            .getRawMany();
+
+        return playlists.map(playlist => ({
+            id: playlist.playlist_id,
+            userId: playlist.playlist_userId,
+            name: playlist.playlist_name,
+            createdAt: playlist.playlist_createdAt,
+            updatedAt: playlist.playlist_updatedAt,
+            trackCount: parseInt(playlist.trackcount) || 0
+        }));
     }
 
     /**

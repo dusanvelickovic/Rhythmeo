@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { Subject, takeUntil } from 'rxjs';
@@ -16,9 +16,10 @@ import {RouterLink} from '@angular/router';
   templateUrl: './liked-tracks.html',
   styleUrl: './liked-tracks.css'
 })
-export class LikedTracks implements OnInit, OnDestroy {
+export class LikedTracks implements OnInit, OnDestroy, AfterViewChecked {
     private destroy$ = new Subject<void>();
     private apiUrl = 'http://localhost:3000';
+    private overflowChecked = false;
 
     tracks = signal<Track[]>([]);
     isLoading = signal(false);
@@ -27,10 +28,12 @@ export class LikedTracks implements OnInit, OnDestroy {
     nextTrack = signal<Track | null>(null);
     previousTrack = signal<Track | null>(null);
     currentTrackIndex = 0;
+    trackOverflows = new Map<string, boolean>();
 
     constructor(
         private readonly store: Store,
-        private readonly http: HttpClient
+        private readonly http: HttpClient,
+        private readonly cdr: ChangeDetectorRef
     ) {}
 
     ngOnInit() {
@@ -104,8 +107,25 @@ export class LikedTracks implements OnInit, OnDestroy {
         this.isTrackModalOpen.set(false);
     }
 
-    checkTextOverflow(element: HTMLElement): boolean {
-        return element.scrollWidth > element.clientWidth;
+    ngAfterViewChecked(): void {
+        if (!this.overflowChecked && this.tracks().length > 0) {
+            this.overflowChecked = true;
+            setTimeout(() => {
+                const elements = document.querySelectorAll('[data-track-name]');
+                elements.forEach((el: Element) => {
+                    const htmlEl = el as HTMLElement;
+                    const trackId = htmlEl.getAttribute('data-track-id');
+                    if (trackId) {
+                        this.trackOverflows.set(trackId, htmlEl.scrollWidth > htmlEl.clientWidth);
+                    }
+                });
+                this.cdr.detectChanges();
+            });
+        }
+    }
+
+    checkTextOverflow(trackId: string): boolean {
+        return this.trackOverflows.get(trackId) || false;
     }
 
     ngOnDestroy(): void {

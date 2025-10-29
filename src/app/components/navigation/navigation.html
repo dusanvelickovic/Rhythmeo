@@ -12,7 +12,12 @@
             >
               Favorites
             </a>
-            <a class="text-gray-300 hover:text-white mx-4 uppercase tracking-wide font-semibold text-sm">
+            <a
+              routerLink="/playlists"
+              routerLinkActive="text-xl text-white"
+              [routerLinkActiveOptions]="{ exact: true }"
+              class="text-gray-300 hover:text-white mx-4 uppercase tracking-wide font-semibold text-sm"
+            >
                 Playlists
             </a>
         </div>

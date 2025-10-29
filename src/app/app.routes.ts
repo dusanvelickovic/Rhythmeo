@@ -6,7 +6,8 @@ import { AuthCallback } from './auth-callback/auth-callback';
 import { authGuard } from './core/guards/auth.guard';
 import { redirectIfAuthnenticated } from './core/guards/redirect-if-authnenticated.guard';
 import { Profile } from './profile/profile';
-import {LikedTracks} from './liked-tracks/liked-tracks';
+import { LikedTracks } from './liked-tracks/liked-tracks';
+import { Playlists } from './playlists/playlists';
 
 export const routes: Routes = [
     // If no path is provided, redirect to /home
@@ -32,6 +33,9 @@ export const routes: Routes = [
 
     // Favorite songs
     { path: 'favorites', component: LikedTracks, canActivate: [authGuard] },
+
+    // Playlists
+    { path: 'playlists', component: Playlists, canActivate: [authGuard] },
 
     // Error handling
     { path: 'auth/error', redirectTo: '/login', pathMatch: 'full' },

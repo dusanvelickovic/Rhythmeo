@@ -54,4 +54,11 @@ export class PlaylistTrackService {
             order: { id: 'ASC' }
         });
     }
+
+    /**
+     * Delete all tracks associated with a playlist
+     */
+    async deleteTracksByPlaylistId(playlistId: number): Promise<void> {
+        await this.playlistTrackRepository.delete({ playlistId });
+    }
 }

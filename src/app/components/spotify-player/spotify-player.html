@@ -161,7 +161,6 @@
             [trackId]="track?.id || playerState?.current_track?.id || null"
             [trackName]="track?.name || playerState?.current_track?.name || null"
             (close)="closeAddToPlaylist()"
-            (addToPlaylist)="onAddToPlaylist($event)"
         ></app-add-to-playlist>
     </div>
 }

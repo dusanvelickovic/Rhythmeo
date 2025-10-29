@@ -188,7 +188,7 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
         if (!this.track?.id) return;
 
         this.isLiked$ = this.store.select(LikedTracksSelectors.selectIsTrackLiked(this.track.id));
-        
+
         this.isLiked$
             .pipe(takeUntil(this.destroy$))
             .subscribe((liked) => {
@@ -229,17 +229,6 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
      */
     closeAddToPlaylist(): void {
         this.showAddToPlaylist.set(false);
-    }
-
-    /**
-     * Handle adding track to playlist
-     */
-    onAddToPlaylist(playlistId: number): void {
-        const trackId = this.track?.id || this.playerState?.current_track?.id;
-        if (trackId) {
-            this.store.dispatch(PlaylistActions.addTrackToPlaylist({ playlistId, trackId }));
-        }
-        this.closeAddToPlaylist();
     }
 
     ngOnDestroy(): void {

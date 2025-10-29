@@ -21,6 +21,55 @@ let PlaylistService = class PlaylistService {
     constructor(playlistRepository) {
         this.playlistRepository = playlistRepository;
     }
+    async getUserPlaylists(userId) {
+        const playlists = await this.playlistRepository
+            .createQueryBuilder('playlist')
+            .leftJoin('playlist_tracks', 'track', 'track.playlistId = playlist.id')
+            .where('playlist.userId = :userId', { userId })
+            .select([
+            'playlist.id',
+            'playlist.userId',
+            'playlist.name',
+            'playlist.createdAt',
+            'playlist.updatedAt',
+            'COUNT(track.id) as trackCount'
+        ])
+            .groupBy('playlist.id')
+            .orderBy('playlist.createdAt', 'DESC')
+            .getRawMany();
+        return playlists.map(playlist => ({
+            id: playlist.playlist_id,
+            userId: playlist.playlist_userId,
+            name: playlist.playlist_name,
+            createdAt: playlist.playlist_createdAt,
+            updatedAt: playlist.playlist_updatedAt,
+            trackCount: parseInt(playlist.trackCount) || 0
+        }));
+    }
+    async createPlaylist(createPlaylistDto) {
+        const playlist = this.playlistRepository.create(createPlaylistDto);
+        return this.playlistRepository.save(playlist);
+    }
+    async getPlaylistById(id, userId) {
+        const playlist = await this.playlistRepository.findOne({ where: { id } });
+        if (!playlist) {
+            throw new common_1.NotFoundException(`Playlist with ID ${id} not found`);
+        }
+        if (playlist.userId !== userId) {
+            throw new common_1.ForbiddenException('You do not have access to this playlist');
+        }
+        return playlist;
+    }
+    async updatePlaylist(id, userId, updatePlaylistDto) {
+        const playlist = await this.getPlaylistById(id, userId);
+        Object.assign(playlist, updatePlaylistDto);
+        return this.playlistRepository.save(playlist);
+    }
+    async deletePlaylist(id, userId) {
+        const playlist = await this.getPlaylistById(id, userId);
+        await this.playlistRepository.remove(playlist);
+        return true;
+    }
 };
 exports.PlaylistService = PlaylistService;
 exports.PlaylistService = PlaylistService = __decorate([

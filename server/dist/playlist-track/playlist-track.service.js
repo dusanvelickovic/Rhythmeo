@@ -21,6 +21,33 @@ let PlaylistTrackService = class PlaylistTrackService {
     constructor(playlistTrackRepository) {
         this.playlistTrackRepository = playlistTrackRepository;
     }
+    async addTrackToPlaylist(playlistId, trackId) {
+        const existing = await this.playlistTrackRepository.findOne({
+            where: { playlistId, trackId }
+        });
+        if (existing) {
+            throw new common_1.ConflictException('Track already exists in this playlist');
+        }
+        const playlistTrack = this.playlistTrackRepository.create({
+            playlistId,
+            trackId
+        });
+        await this.playlistTrackRepository.save(playlistTrack);
+        return true;
+    }
+    async removeTrackFromPlaylist(playlistId, trackId) {
+        const result = await this.playlistTrackRepository.delete({
+            playlistId,
+            trackId
+        });
+        return result.affected ? result.affected > 0 : false;
+    }
+    async getPlaylistTracks(playlistId) {
+        return this.playlistTrackRepository.find({
+            where: { playlistId },
+            order: { id: 'ASC' }
+        });
+    }
 };
 exports.PlaylistTrackService = PlaylistTrackService;
 exports.PlaylistTrackService = PlaylistTrackService = __decorate([

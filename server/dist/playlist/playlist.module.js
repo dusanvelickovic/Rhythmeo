@@ -12,12 +12,16 @@ const typeorm_1 = require("@nestjs/typeorm");
 const playlist_controller_1 = require("./playlist.controller");
 const playlist_service_1 = require("./playlist.service");
 const playlist_entity_1 = require("./playlist.entity");
+const playlist_track_module_1 = require("../playlist-track/playlist-track.module");
 let PlaylistModule = class PlaylistModule {
 };
 exports.PlaylistModule = PlaylistModule;
 exports.PlaylistModule = PlaylistModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([playlist_entity_1.Playlist])],
+        imports: [
+            typeorm_1.TypeOrmModule.forFeature([playlist_entity_1.Playlist]),
+            playlist_track_module_1.PlaylistTrackModule
+        ],
         controllers: [playlist_controller_1.PlaylistController],
         providers: [playlist_service_1.PlaylistService],
         exports: [playlist_service_1.PlaylistService],

@@ -62,7 +62,13 @@ export class PlaylistController {
     @UseGuards(JwtAuthGuard)
     async deletePlaylist(@Request() req: any, @Param('id') id: number) {
         const userId = req.user.id;
+
+        // Delete all tracks associated with the playlist
+        await this.playlistTrackService.deleteTracksByPlaylistId(id);
+
+        // Delete the playlist
         const success = await this.playlistService.deletePlaylist(id, userId);
+
         return { success };
     }
 
