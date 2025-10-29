@@ -88,4 +88,20 @@ export class PlaylistController {
         const success = await this.playlistTrackService.addTrackToPlaylist(id, body.trackId);
         return { success };
     }
+
+    /**
+     * Get all tracks in a playlist for the authenticated user
+     */
+    @Get(':id/tracks')
+    @UseGuards(JwtAuthGuard)
+    async getPlaylistTracks(
+        @Request() req: any,
+        @Param('id') id: number
+    ) {
+        const userId = req.user.id;
+        // Verify user owns the playlist
+        await this.playlistService.getPlaylistById(id, userId);
+        const tracks = await this.playlistTrackService.getPlaylistTracks(id);
+        return tracks;
+    }
 }

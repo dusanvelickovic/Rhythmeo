@@ -8,6 +8,7 @@ import { redirectIfAuthnenticated } from './core/guards/redirect-if-authnenticat
 import { Profile } from './profile/profile';
 import { LikedTracks } from './liked-tracks/liked-tracks';
 import { Playlists } from './playlists/playlists';
+import { PlaylistDetail } from './playlist-detail/playlist-detail';
 
 export const routes: Routes = [
     // If no path is provided, redirect to /home
@@ -36,6 +37,7 @@ export const routes: Routes = [
 
     // Playlists
     { path: 'playlists', component: Playlists, canActivate: [authGuard] },
+    { path: 'playlist/:id', component: PlaylistDetail, canActivate: [authGuard] },
 
     // Error handling
     { path: 'auth/error', redirectTo: '/login', pathMatch: 'full' },
