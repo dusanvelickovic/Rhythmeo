@@ -92,3 +92,19 @@ export const updatePlaylistFailure = createAction(
     '[Playlist] Update Playlist Failure',
     props<{ error: any }>()
 );
+
+// Remove Track from Playlist
+export const removeTrackFromPlaylist = createAction(
+    '[Playlist] Remove Track from Playlist',
+    props<{ playlistId: number; trackId: string }>()
+);
+
+export const removeTrackFromPlaylistSuccess = createAction(
+    '[Playlist] Remove Track from Playlist Success',
+    props<{ playlistId: number; trackId: string }>()
+);
+
+export const removeTrackFromPlaylistFailure = createAction(
+    '[Playlist] Remove Track from Playlist Failure',
+    props<{ error: any }>()
+);

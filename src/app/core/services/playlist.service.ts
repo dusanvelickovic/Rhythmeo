@@ -56,4 +56,11 @@ export class PlaylistService {
     getPlaylistById(playlistId: number): Observable<Playlist> {
         return this.http.get<Playlist>(`${this.apiUrl}/${playlistId}`);
     }
+
+    /**
+     * Remove a track from a playlist
+     */
+    removeTrackFromPlaylist(playlistId: number, trackId: string): Observable<{ success: boolean }> {
+        return this.http.delete<{ success: boolean }>(`${this.apiUrl}/${playlistId}/tracks/${trackId}`);
+    }
 }

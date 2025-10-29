@@ -89,4 +89,20 @@ export class PlaylistEffects {
             )
         )
     );
+
+    removeTrackFromPlaylist$ = createEffect(() =>
+        this.actions$.pipe(
+            ofType(PlaylistActions.removeTrackFromPlaylist),
+            switchMap(({ playlistId, trackId }) =>
+                this.playlistService.removeTrackFromPlaylist(playlistId, trackId).pipe(
+                    map(() =>
+                        PlaylistActions.removeTrackFromPlaylistSuccess({ playlistId, trackId })
+                    ),
+                    catchError((error) =>
+                        of(PlaylistActions.removeTrackFromPlaylistFailure({ error }))
+                    )
+                )
+            )
+        )
+    );
 }

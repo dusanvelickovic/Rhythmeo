@@ -147,6 +147,20 @@ export class PlaylistDetail implements OnInit, OnDestroy {
     }
 
     /**
+     * Remove a track from the playlist
+     */
+    removeTrack(track: Track, event: Event) {
+        event.stopPropagation();
+        this.store.dispatch(PlaylistActions.removeTrackFromPlaylist({
+            playlistId: this.playlistId,
+            trackId: track.id
+        }));
+        
+        const updatedTracks = this.tracks().filter(t => t.id !== track.id);
+        this.tracks.set(updatedTracks);
+    }
+
+    /**
      * Cleanup on component destroy
      */
     ngOnDestroy(): void {

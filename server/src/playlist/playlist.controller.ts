@@ -104,4 +104,21 @@ export class PlaylistController {
         const tracks = await this.playlistTrackService.getPlaylistTracks(id);
         return tracks;
     }
+
+    /**
+     * Remove a track from a playlist for the authenticated user
+     */
+    @Delete(':id/tracks/:trackId')
+    @UseGuards(JwtAuthGuard)
+    async removeTrackFromPlaylist(
+        @Request() req: any,
+        @Param('id') id: number,
+        @Param('trackId') trackId: string
+    ) {
+        const userId = req.user.id;
+        // Verify user owns the playlist
+        await this.playlistService.getPlaylistById(id, userId);
+        const success = await this.playlistTrackService.removeTrackFromPlaylist(id, trackId);
+        return { success };
+    }
 }

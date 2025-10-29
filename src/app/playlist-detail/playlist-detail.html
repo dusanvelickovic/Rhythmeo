@@ -40,7 +40,7 @@
         <div class="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-6">
             @for (track of tracks(); track track.id) {
                 <div class="flex flex-col items-center justify-between space-y-1 overflow-hidden">
-                    <div class="relative">
+                    <div class="relative group">
                         <img
                             (click)="openTrackModal(track)"
                             [src]="track.album.images[0]?.url"
@@ -48,6 +48,15 @@
                             class="h-64 rounded-lg border border-emerald-950 shadow shadow-black cursor-pointer object-cover"
                         />
                         <div class="absolute inset-0 rounded-lg bg-gray-700 mix-blend-overlay pointer-events-none"></div>
+                        <button
+                            (click)="removeTrack(track, $event)"
+                            class="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg"
+                            title="Remove from playlist"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                            </svg>
+                        </button>
                     </div>
                     <div class="w-64">
                         <div>
