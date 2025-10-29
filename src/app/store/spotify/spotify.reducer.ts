@@ -35,5 +35,9 @@ export const spotifyReducer = createReducer(
         ...state,
         tracksLoading: false,
         tracksError: error,
+    })),
+    on(SpotifyActions.clearTracks, (state) => ({
+        ...state,
+        tracks: [],
     }))
 );

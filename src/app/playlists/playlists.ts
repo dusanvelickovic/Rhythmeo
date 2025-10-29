@@ -2,10 +2,15 @@ import { Component, OnInit, OnDestroy, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, forkJoin } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import { loadPlaylists, deletePlaylist } from '../store/playlist/playlist.actions';
 import { selectAllPlaylists, selectPlaylistsLoading } from '../store/playlist/playlist.selectors';
 import { Playlist } from '../store/playlist/playlist.state';
+
+interface PlaylistWithImage extends Playlist {
+    firstTrackImageUrl?: string;
+}
 
 @Component({
     selector: 'app-playlists',
@@ -43,7 +48,7 @@ export class Playlists implements OnInit, OnDestroy {
     onDeletePlaylist(playlistId: number, event: Event): void {
         event.stopPropagation();
         event.preventDefault();
-        
+
         if (confirm('Are you sure you want to delete this playlist?')) {
             this.store.dispatch(deletePlaylist({ playlistId }));
         }

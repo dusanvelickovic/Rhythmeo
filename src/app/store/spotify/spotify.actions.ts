@@ -27,3 +27,5 @@ export const loadTracksFailure = createAction(
     '[Spotify] Load Tracks Failure',
     props<{ error: any }>()
 );
+
+export const clearTracks = createAction('[Spotify] Clear Tracks');

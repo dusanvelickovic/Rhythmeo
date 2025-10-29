@@ -2,6 +2,8 @@ import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/commo
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Playlist } from './playlist.entity';
+import { SpotifyService } from '../spotify/spotify.service';
+import {UsersService} from '../users/users.service';
 
 export interface CreatePlaylistDto {
     userId: string;
@@ -17,6 +19,8 @@ export class PlaylistService {
     constructor(
         @InjectRepository(Playlist)
         private playlistRepository: Repository<Playlist>,
+        private spotifyService: SpotifyService,
+        private userService: UsersService,
     ) {}
 
     /**
@@ -25,7 +29,7 @@ export class PlaylistService {
     async getUserPlaylists(userId: string): Promise<any[]> {
         const playlists = await this.playlistRepository
             .createQueryBuilder('playlist')
-            .leftJoin('playlist_tracks', 'track', 'track.playlistId = playlist.id')
+            .leftJoin('playlist_tracks', 'pt', 'pt.playlistId = playlist.id')
             .where('playlist.userId = :userId', { userId })
             .select([
                 'playlist.id',
@@ -33,20 +37,44 @@ export class PlaylistService {
                 'playlist.name',
                 'playlist.createdAt',
                 'playlist.updatedAt',
-                'COUNT(track.id) as trackCount'
+                'COUNT(pt.id) as trackCount',
+                'MIN(pt.trackId) as firstTrackId'
             ])
             .groupBy('playlist.id')
             .orderBy('playlist.createdAt', 'DESC')
             .getRawMany();
 
-        return playlists.map(playlist => ({
-            id: playlist.playlist_id,
-            userId: playlist.playlist_userId,
-            name: playlist.playlist_name,
-            createdAt: playlist.playlist_createdAt,
-            updatedAt: playlist.playlist_updatedAt,
-            trackCount: parseInt(playlist.trackcount) || 0
+        const userSpotifyId = await this.userService.getSpotifyIdById(userId);
+
+        // Fetch cover images for each playlist
+        const playlistsWithImages = await Promise.all(playlists.map(async (playlist) => {
+            let imageUrl = null;
+
+            if (playlist.firsttrackid) {
+
+                try {
+                    const trackData = await this.spotifyService.getTrackById(userSpotifyId, playlist.firsttrackid);
+
+                    if (trackData?.album?.images?.[0]?.url) {
+                        imageUrl = trackData.album.images[0].url;
+                    }
+                } catch (error) {
+                    console.error(`Failed to fetch cover for playlist ${playlist.playlist_id}:`, error.message);
+                }
+            }
+
+            return {
+                id: playlist.playlist_id,
+                userId: playlist.playlist_userId,
+                name: playlist.playlist_name,
+                createdAt: playlist.playlist_createdAt,
+                updatedAt: playlist.playlist_updatedAt,
+                trackCount: parseInt(playlist.trackcount) || 0,
+                imageUrl
+            };
         }));
+
+        return playlistsWithImages;
     }
 
     /**

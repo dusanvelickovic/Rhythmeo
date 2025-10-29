@@ -16,4 +16,16 @@ export class UsersService {
     findBySpotifyId(spotifyId: string) {
         return this.userRepository.findOneBy({ spotifyId });
     }
+
+    /**
+     * Get Spotify ID by internal user ID
+     */
+    async getSpotifyIdById(id: string): Promise<string | null> {
+        const user = await this.userRepository
+            .findOne({
+                where: {id},
+                select: ['spotifyId'],
+            });
+        return user ? user.spotifyId : null;
+    }
 }

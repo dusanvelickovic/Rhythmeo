@@ -1,13 +1,14 @@
 import { Component, OnInit, OnDestroy, signal, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
-import { Subject, takeUntil } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { Subject, takeUntil, combineLatest, filter, distinctUntilChanged, map } from 'rxjs';
 import { Track } from '../core/types/track';
 import { TrackModal } from '../components/track-modal/track-modal';
 import * as SpotifyActions from '../store/spotify/spotify.actions';
 import * as SpotifySelectors from '../store/spotify/spotify.selectors';
 import * as PlayerActions from '../store/player/player.actions';
+import * as LikedTracksActions from '../store/liked-tracks';
+import * as LikedTracksSelectors from '../store/liked-tracks';
 import {RouterLink} from '@angular/router';
 
 @Component({
@@ -18,7 +19,6 @@ import {RouterLink} from '@angular/router';
 })
 export class LikedTracks implements OnInit, OnDestroy, AfterViewChecked {
     private destroy$ = new Subject<void>();
-    private apiUrl = 'http://localhost:3000';
     private overflowChecked = false;
 
     tracks = signal<Track[]>([]);
@@ -32,21 +32,32 @@ export class LikedTracks implements OnInit, OnDestroy, AfterViewChecked {
 
     constructor(
         private readonly store: Store,
-        private readonly http: HttpClient,
         private readonly cdr: ChangeDetectorRef
     ) {}
 
     ngOnInit() {
         this.loadLikedTracks();
 
+        this.store.select(LikedTracksSelectors.selectAllLikedTracks)
+            .pipe(
+                takeUntil(this.destroy$),
+                map(likedTracks => likedTracks.map(track => track.trackId)),
+                distinctUntilChanged((prev, curr) => 
+                    prev.length === curr.length && prev.every((id, i) => id === curr[i])
+                ),
+                filter(trackIds => trackIds.length > 0)
+            )
+            .subscribe(trackIds => {
+                this.store.dispatch(SpotifyActions.loadTracks({ trackIds }));
+            });
+
         this.store.select(SpotifySelectors.selectTracks)
             .pipe(takeUntil(this.destroy$))
             .subscribe(tracks => {
                 this.tracks.set(tracks);
-                this.isLoading.set(false);
             });
 
-        this.store.select(SpotifySelectors.selectTracksLoading)
+        this.store.select(LikedTracksSelectors.selectLikedTracksLoading)
             .pipe(takeUntil(this.destroy$))
             .subscribe(loading => {
                 this.isLoading.set(loading);
@@ -54,23 +65,7 @@ export class LikedTracks implements OnInit, OnDestroy, AfterViewChecked {
     }
 
     loadLikedTracks() {
-        this.isLoading.set(true);
-        this.http.get<any[]>(`${this.apiUrl}/liked-tracks`)
-            .pipe(takeUntil(this.destroy$))
-            .subscribe({
-                next: (likedTracks) => {
-                    const trackIds = likedTracks.map(track => track.trackId);
-                    if (trackIds.length > 0) {
-                        this.store.dispatch(SpotifyActions.loadTracks({ trackIds }));
-                    } else {
-                        this.isLoading.set(false);
-                    }
-                },
-                error: (error) => {
-                    console.error('Failed to fetch liked tracks', error);
-                    this.isLoading.set(false);
-                }
-            });
+        this.store.dispatch(LikedTracksActions.loadLikedTracks());
     }
 
     openTrackModal(track: Track) {

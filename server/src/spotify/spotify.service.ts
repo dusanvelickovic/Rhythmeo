@@ -61,4 +61,26 @@ export class SpotifyService {
             throw new Error(`Spotify API error: ${error.response?.data?.error?.message || error.message}`);
         }
     }
+
+    /**
+     * Get a single track by its Spotify ID
+     */
+    async getTrackById(spotifyId: string, trackId: string): Promise<any> {
+        const accessToken = await this.authService.getAccessToken(spotifyId);
+
+        const headers = {
+            Authorization: `Bearer ${accessToken}`,
+        }
+
+        const url = `${this.spotifyApiUrl}/tracks/${trackId}`;
+
+        try {
+            const response = await firstValueFrom(
+                this.http.get(url, { headers }),
+            );
+            return response.data;
+        } catch (error) {
+            throw new Error(`Spotify API error: ${error.response?.data?.error?.message || error.message}`);
+        }
+    }
 }

@@ -37,23 +37,27 @@
 
     <!-- Playlists Grid -->
     @else {
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div class="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-6">
             @for (playlist of playlists(); track playlist.id) {
-                <a [routerLink]="['/playlist', playlist.id]" class="bg-gray-800 backdrop-blur-sm rounded-2xl overflow-hidden shadow-2xl border border-gray-700 hover:border-emerald-600 transition-all duration-200 hover:scale-105 group cursor-pointer">
-                    <!-- Playlist Image -->
-                    <div class="relative aspect-square bg-gradient-to-br from-emerald-600 to-emerald-800 overflow-hidden">
+                <a [routerLink]="['/playlist', playlist.id]" class="flex flex-col items-center justify-between space-y-1 overflow-hidden group cursor-pointer">
+                    <div class="relative">
                         @if (playlist.imageUrl) {
-                            <img [src]="playlist.imageUrl" [alt]="playlist.name" class="w-full h-full object-cover" />
+                            <img
+                                [src]="playlist.imageUrl"
+                                [alt]="playlist.name"
+                                class="h-64 rounded-lg border border-emerald-950 shadow shadow-black object-cover"
+                            />
                         } @else {
-                            <div class="w-full h-full flex items-center justify-center">
+                            <div class="h-64 w-64 rounded-lg border border-emerald-950 shadow shadow-black bg-gradient-to-br from-emerald-600 to-emerald-800 flex items-center justify-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-24 h-24 text-white opacity-50">
                                     <path fill-rule="evenodd" d="M19.952 1.651a.75.75 0 0 1 .298.599V16.303a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.403-4.909l2.311-.66a1.5 1.5 0 0 0 1.088-1.442V6.994l-9 2.572v9.737a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.402-4.909l2.31-.66a1.5 1.5 0 0 0 1.088-1.442V3.25a.75.75 0 0 1 .544-.721l10.5-3a.75.75 0 0 1 .658.122Z" clip-rule="evenodd" />
                                 </svg>
                             </div>
                         }
+                        <div class="absolute inset-0 rounded-lg bg-gray-700 mix-blend-overlay pointer-events-none"></div>
 
-                        <!-- Overlay on hover -->
-                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-4">
+                        <!-- Overlay on hover with delete button -->
+                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-4 rounded-lg">
                             <button
                                 (click)="onDeletePlaylist(playlist.id, $event)"
                                 class="p-3 bg-red-600 hover:bg-red-500 rounded-full transition-all duration-200 hover:scale-110"
@@ -65,18 +69,11 @@
                             </button>
                         </div>
                     </div>
-
-                    <!-- Playlist Info -->
-                    <div class="p-5">
-                        <h3 class="text-lg font-bold text-white uppercase tracking-wider mb-2 truncate group-hover:text-emerald-400 transition-colors">
-                            {{ playlist.name }}
-                        </h3>
-                        <div class="flex items-center gap-2 text-xs text-gray-500">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
-                                <path fill-rule="evenodd" d="M19.952 1.651a.75.75 0 0 1 .298.599V16.303a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.403-4.909l2.311-.66a1.5 1.5 0 0 0 1.088-1.442V6.994l-9 2.572v9.737a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.402-4.909l2.31-.66a1.5 1.5 0 0 0 1.088-1.442V3.25a.75.75 0 0 1 .544-.721l10.5-3a.75.75 0 0 1 .658.122Z" clip-rule="evenodd" />
-                            </svg>
-                            <span>{{ playlist.trackCount || 0 }} tracks</span>
+                    <div class="w-64">
+                        <div>
+                            <h2 class="text-white text-base w-full text-center tracking-wide uppercase font-medium whitespace-nowrap">{{ playlist.name }}</h2>
                         </div>
+                        <h2 class="text-sm text-center tracking-wide text-gray-300 font-medium">{{ playlist.trackCount || 0 }} tracks</h2>
                     </div>
                 </a>
             }

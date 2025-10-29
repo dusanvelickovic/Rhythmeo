@@ -48,6 +48,7 @@ export class PlaylistDetail implements OnInit, OnDestroy {
             .pipe(takeUntil(this.destroy$))
             .subscribe(params => {
                 this.playlistId = +params['id'];
+                this.store.dispatch(SpotifyActions.clearTracks());
                 this.loadPlaylistDetails();
             });
 
