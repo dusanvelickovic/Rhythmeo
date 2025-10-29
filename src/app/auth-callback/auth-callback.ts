@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AuthService } from '../core/services/auth.service';
 import { Store } from '@ngrx/store';
 import { filter, take } from 'rxjs/operators';
 import * as AuthSelectors from '../store/auth/auth.selectors';
+import * as AuthActions from '../store/auth/auth.actions';
 
 @Component({
     selector: 'app-auth-callback',
@@ -43,7 +43,6 @@ export class AuthCallback implements OnInit {
     constructor(
         private route: ActivatedRoute,
         private router: Router,
-        private authService: AuthService,
         private store: Store
     ) {}
 
@@ -52,8 +51,8 @@ export class AuthCallback implements OnInit {
             const token = params['token'];
 
             if (token) {
-                this.authService.handleLoginCallback(token);
-                
+                this.store.dispatch(AuthActions.handleLoginCallback({ token }));
+
                 this.store.select(AuthSelectors.selectAuthLoading).pipe(
                     filter(loading => !loading),
                     take(1)

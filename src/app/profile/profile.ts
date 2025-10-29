@@ -1,12 +1,12 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {User} from '../core/types/user';
-import {AuthService} from '../core/services/auth.service';
 import {RouterLink} from '@angular/router';
 import {Store} from '@ngrx/store';
 import {Observable} from 'rxjs';
 import * as AuthSelectors from '../store/auth/auth.selectors';
 import {AsyncPipe} from '@angular/common';
 import {ExtractUrlPipe} from '../core/pipes/extract-url.pipe';
+import {logout} from '../store/auth';
 
 @Component({
   selector: 'app-profile',
@@ -17,13 +17,12 @@ import {ExtractUrlPipe} from '../core/pipes/extract-url.pipe';
     ],
   templateUrl: './profile.html',
 })
-export class Profile implements OnInit{
+export class Profile{
     user$: Observable<User | null>;
     loading$: Observable<boolean>;
     error$: Observable<any>;
 
     constructor(
-        private authService: AuthService,
         private store: Store
     ) {
         this.user$ = this.store.select(AuthSelectors.selectCurrentUser);
@@ -31,13 +30,10 @@ export class Profile implements OnInit{
         this.error$ = this.store.select(AuthSelectors.selectAuthError);
     }
 
-    ngOnInit() {
-    }
-
     /**
      * Log out the current user
      */
     logout(): void {
-        this.authService.logout();
+        this.store.dispatch(logout())
     }
 }

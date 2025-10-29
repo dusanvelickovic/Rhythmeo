@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {AuthService} from '../core/services/auth.service';
+import {Store} from '@ngrx/store';
+import {loginWithSpotify} from '../store/auth';
 
 @Component({
     selector: 'app-login',
@@ -8,11 +10,9 @@ import {AuthService} from '../core/services/auth.service';
     styleUrl: './login.css',
 })
 export class Login {
-    constructor(
-        private authService: AuthService,
-    ) {}
+    private store = inject(Store);
 
     loginWithSpotify() {
-        this.authService.loginWithSpotify();
+        this.store.dispatch(loginWithSpotify())
     }
 }

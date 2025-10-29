@@ -1,8 +1,25 @@
-<div class="flex flex-col items-center justify-center min-h-screen text-white overflow-hidden">
+<div class="flex flex-col items-center justify-center min-h-screen text-white overflow-hidden relative">
+    <!-- Decorative music stickers -->
+    <div class="absolute text-6xl opacity-15 top-[10%] left-[15%] animate-float">🎵</div>
+    <div class="absolute text-6xl opacity-15 top-[20%] right-[20%] animate-float-delayed-1">🎶</div>
+    <div class="absolute text-6xl opacity-15 bottom-[15%] left-[10%] animate-float-delayed-2">🎸</div>
+    <div class="absolute text-6xl opacity-15 bottom-[25%] right-[15%] animate-float-delayed-3">🎧</div>
+    <div class="absolute text-6xl opacity-15 top-[50%] left-[5%] animate-float-delayed-4">🎤</div>
+
     <div
         class="login-card z-10 rounded-4xl relative p-11 max-w-md w-full flex flex-col items-center"
     >
-        <h2 class="text-5xl font-bold mb-10 text-center">Rhythmeo</h2>
+        <h2 class="text-4xl font-bold mb-4 text-center">Rhythmeo</h2>
+
+        <!-- Tagline text -->
+        <p class="text-gray-300 text-center mb-8 text-lg">
+            Your music, your rhythm, your way 🎵
+        </p>
+
+        <p class="text-gray-400 text-center mb-6 text-sm">
+            Connect with Spotify to unlock your personalized music experience
+        </p>
+
         <button
             (click)="loginWithSpotify()"
             class="flex cursor-pointer items-center justify-center gap-4 bg-[#1DB954] text-white px-12 py-4 rounded-full font-semibold text-lg transition-all duration-300 ease-in-out transform hover:scale-105"
@@ -14,5 +31,10 @@
             />
             <span>Continue with Spotify</span>
         </button>
+
+        <!-- Footer text -->
+        <p class="text-gray-500 text-xs mt-8 text-center">
+            Discover, create, and share your musical journey ✨
+        </p>
     </div>
 </div>
