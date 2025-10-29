@@ -40,7 +40,7 @@
                         </div>
                         <div class="w-64">
                             <div>
-                                <h2 #trackName class="text-white text-base w-full text-center tracking-wide uppercase font-medium whitespace-nowrap" [class.animate-marquee]="checkTextOverflow(trackName)">{{ track.name }}</h2>
+                                <h2 class="text-white text-base w-full text-center tracking-wide uppercase font-medium whitespace-nowrap overflow-hidden text-ellipsis">{{ track.name }}</h2>
                             </div>
                             <h2 class="text-sm text-center tracking-wide text-gray-300 font-medium">{{ track.artists.at(0)?.name }}</h2>
                         </div>

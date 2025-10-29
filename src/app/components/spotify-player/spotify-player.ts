@@ -7,6 +7,7 @@ import * as PlayerSelectors from '../../store/player/player.selectors';
 import { PlayerState } from '../../store/player/player.state';
 import * as LikedTracksActions from '../../store/liked-tracks/liked-tracks.actions';
 import * as LikedTracksSelectors from '../../store/liked-tracks/liked-tracks.selectors';
+import * as PlaylistActions from '../../store/playlist/playlist.actions';
 import { AddToPlaylist } from '../add-to-playlist/add-to-playlist';
 
 @Component({
@@ -234,10 +235,11 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
      * Handle adding track to playlist
      */
     onAddToPlaylist(playlistId: number): void {
-        console.log('Adding track to playlist:', playlistId, this.track?.id);
-        // TODO: Dispatch action to add track to playlist
+        const trackId = this.track?.id || this.playerState?.current_track?.id;
+        if (trackId) {
+            this.store.dispatch(PlaylistActions.addTrackToPlaylist({ playlistId, trackId }));
+        }
         this.closeAddToPlaylist();
-        // Show success message
     }
 
     ngOnDestroy(): void {

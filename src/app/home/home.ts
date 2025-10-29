@@ -1,6 +1,6 @@
 // file: `src/app/home/home.ts`
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, signal, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, signal, ViewChild, ElementRef, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Track } from '../core/types/track';
 import { TrackModal } from '../components/track-modal/track-modal';
 import { Store } from '@ngrx/store';
@@ -34,6 +34,7 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
 
     constructor(
         private readonly store: Store,
+        private cdr: ChangeDetectorRef
     ) {}
 
     ngOnInit() {
@@ -181,10 +182,6 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
         this.store.dispatch(PlayerActions.pause());
 
         this.isTrackModalOpen.set(false);
-    }
-
-    checkTextOverflow(element: HTMLElement): boolean {
-        return element.scrollWidth > element.clientWidth;
     }
 
     ngOnDestroy(): void {
