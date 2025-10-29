@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Subject, takeUntil } from 'rxjs';
@@ -16,7 +17,7 @@ import { Playlist } from '../store/playlist/playlist.state';
 @Component({
     selector: 'app-playlist-detail',
     standalone: true,
-    imports: [CommonModule, TrackModal, RouterLink],
+    imports: [CommonModule, FormsModule, TrackModal, RouterLink],
     templateUrl: './playlist-detail.html',
 })
 export class PlaylistDetail implements OnInit, OnDestroy {
@@ -32,6 +33,8 @@ export class PlaylistDetail implements OnInit, OnDestroy {
     nextTrack = signal<Track | null>(null);
     previousTrack = signal<Track | null>(null);
     currentTrackIndex = 0;
+    isEditingName = signal(false);
+    editedName = signal('');
 
     constructor(
         private readonly route: ActivatedRoute,
@@ -158,6 +161,36 @@ export class PlaylistDetail implements OnInit, OnDestroy {
         
         const updatedTracks = this.tracks().filter(t => t.id !== track.id);
         this.tracks.set(updatedTracks);
+    }
+
+    /**
+     * Start editing playlist name
+     */
+    startEditingName() {
+        this.editedName.set(this.playlist()?.name || '');
+        this.isEditingName.set(true);
+    }
+
+    /**
+     * Save the updated playlist name
+     */
+    savePlaylistName() {
+        const newName = this.editedName().trim();
+        if (newName && newName !== this.playlist()?.name) {
+            this.store.dispatch(PlaylistActions.updatePlaylist({
+                playlistId: this.playlistId,
+                updates: { name: newName }
+            }));
+        }
+        this.isEditingName.set(false);
+    }
+
+    /**
+     * Cancel editing playlist name
+     */
+    cancelEditingName() {
+        this.isEditingName.set(false);
+        this.editedName.set('');
     }
 
     /**
