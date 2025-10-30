@@ -8,7 +8,6 @@ import * as PlayerSelectors from '../../store/player/player.selectors';
 import { PlayerState } from '../../store/player/player.state';
 import * as LikedTracksActions from '../../store/liked-tracks/liked-tracks.actions';
 import * as LikedTracksSelectors from '../../store/liked-tracks/liked-tracks.selectors';
-import * as PlaylistActions from '../../store/playlist/playlist.actions';
 import { AddToPlaylist } from '../add-to-playlist/add-to-playlist';
 
 @Component({
@@ -58,7 +57,7 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
     onDocumentClick(event: MouseEvent): void {
         const target = event.target as HTMLElement;
         const volumeControl = target.closest('.volume-control-container');
-        
+
         if (!volumeControl && this.showVolumeSlider()) {
             this.showVolumeSlider.set(false);
         }
@@ -68,6 +67,17 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
         // Update liked status selector when track changes
         if (changes['track'] && changes['track'].currentValue) {
             this.updateLikedStatusObservable();
+
+            // Check player state from store directly since local playerState may not be initialized yet
+            this.playerState$.pipe(
+                takeUntil(this.destroy$)
+            ).subscribe(state => {
+                // If there was a track playing before, immediately play the new track
+                if (state?.current_track && !state.paused) {
+                    this.songWasPlayed = true;
+                    this.store.dispatch(PlayerActions.play({ uri: changes['track'].currentValue.uri }));
+                }
+            }).unsubscribe();
         }
     }
 

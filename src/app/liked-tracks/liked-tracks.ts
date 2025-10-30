@@ -6,7 +6,6 @@ import { Track } from '../core/types/track';
 import { TrackModal } from '../components/track-modal/track-modal';
 import * as SpotifyActions from '../store/spotify/spotify.actions';
 import * as SpotifySelectors from '../store/spotify/spotify.selectors';
-import * as PlayerActions from '../store/player/player.actions';
 import * as LikedTracksActions from '../store/liked-tracks';
 import * as LikedTracksSelectors from '../store/liked-tracks';
 import {RouterLink} from '@angular/router';
@@ -42,7 +41,7 @@ export class LikedTracks implements OnInit, OnDestroy, AfterViewChecked {
             .pipe(
                 takeUntil(this.destroy$),
                 map(likedTracks => likedTracks.map(track => track.trackId)),
-                distinctUntilChanged((prev, curr) => 
+                distinctUntilChanged((prev, curr) =>
                     prev.length === curr.length && prev.every((id, i) => id === curr[i])
                 ),
                 filter(trackIds => trackIds.length > 0)
@@ -98,7 +97,6 @@ export class LikedTracks implements OnInit, OnDestroy, AfterViewChecked {
     }
 
     closeTrackModal() {
-        this.store.dispatch(PlayerActions.pause());
         this.isTrackModalOpen.set(false);
     }
 

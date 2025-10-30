@@ -9,7 +9,6 @@ import { Track } from '../core/types/track';
 import { TrackModal } from '../components/track-modal/track-modal';
 import * as SpotifyActions from '../store/spotify/spotify.actions';
 import * as SpotifySelectors from '../store/spotify/spotify.selectors';
-import * as PlayerActions from '../store/player/player.actions';
 import * as PlaylistActions from '../store/playlist/playlist.actions';
 import { selectPlaylistById } from '../store/playlist/playlist.selectors';
 import { Playlist } from '../store/playlist/playlist.state';
@@ -145,7 +144,6 @@ export class PlaylistDetail implements OnInit, OnDestroy {
      * Close the track modal
      */
     closeTrackModal() {
-        this.store.dispatch(PlayerActions.pause());
         this.isTrackModalOpen.set(false);
     }
 
@@ -158,7 +156,7 @@ export class PlaylistDetail implements OnInit, OnDestroy {
             playlistId: this.playlistId,
             trackId: track.id
         }));
-        
+
         const updatedTracks = this.tracks().filter(t => t.id !== track.id);
         this.tracks.set(updatedTracks);
     }

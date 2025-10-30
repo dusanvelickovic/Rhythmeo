@@ -4,7 +4,6 @@ import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, signal, ViewChild, ElementRe
 import { Track } from '../core/types/track';
 import { TrackModal } from '../components/track-modal/track-modal';
 import { Store } from '@ngrx/store';
-import * as PlayerActions from '../store/player/player.actions';
 import * as SpotifyActions from '../store/spotify/spotify.actions';
 import * as SpotifySelectors from '../store/spotify/spotify.selectors';
 import * as SpotifySearchSelectors from '../store/spotify-search/spotify-search.selectors';
@@ -204,8 +203,6 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
     }
 
     closeTrackModal() {
-        this.store.dispatch(PlayerActions.pause());
-
         this.isTrackModalOpen.set(false);
     }
 
