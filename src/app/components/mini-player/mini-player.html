@@ -1,9 +1,9 @@
 @if (shouldShow()) {
-    <div class="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-black/10 via-emerald-950 to-black/70 backdrop-blur-md border-t-2 border-emerald-950 shadow-2xl z-40 animate-in slide-in-from-bottom duration-300">
+    <div class="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-black/70 via-emerald-950 to-black/70 backdrop-blur-md border-t-2 border-emerald-950 shadow-2xl z-40 animate-in slide-in-from-bottom duration-300">
         <div class="max-w-7xl mx-auto px-6 py-3">
-            <div class="flex items-center justify-between gap-4">
+            <div class="flex items-center justify-between gap-4 ">
                 <!-- Track Info -->
-                <div class="flex items-center gap-4 flex-1 min-w-0">
+                <div class="flex items-center gap-4 min-w-0">
                     <img
                         [src]="playerState?.current_track?.album?.images?.at(0)?.url"
                         [alt]="playerState?.current_track?.name"
@@ -19,16 +19,68 @@
                     </div>
                 </div>
 
-                <!-- Open Modal Button -->
-                <button
-                    (click)="openTrackModal()"
-                    class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-700 hover:from-emerald-600 hover:to-emerald-800 text-white rounded-xl text-sm font-semibold uppercase tracking-wider shadow-lg transition-all duration-200 hover:scale-105"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
-                    </svg>
-                    <span>Open Player</span>
-                </button>
+                <!-- Player Controls -->
+                <div class="flex items-center justify-center gap-2 flex-1">
+                    <!-- Playback Controls -->
+                    <div class="flex items-center gap-3">
+                        <button
+                            (click)="togglePlay()"
+                            class="bg-white text-black rounded-full p-2 hover:scale-105 transition-transform"
+                            title="{{ playerState?.paused ? 'Play' : 'Pause' }}"
+                        >
+                            @if (playerState?.paused) {
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-5 h-5">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            } @else {
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-5 h-5">
+                                    <path d="M6 4h4v16H6zm8 0h4v16h-4z"/>
+                                </svg>
+                            }
+                        </button>
+                    </div>
+
+                    <!-- Time Slider -->
+                    <div class="flex items-center gap-2 w-full flex-1">
+                        <span class="text-xs text-right text-gray-400 min-w-[40px]">{{ formatTime(playerState?.position || 0) }}</span>
+                        <input
+                            type="range"
+                            class="w-full h-2 accent-white bg-gray-800 rounded-lg appearance-none"
+                            [value]="playerState?.position"
+                            [max]="playerState?.duration"
+                            (input)="onSeek($event)"
+                        />
+                        <span class="text-xs text-gray-400 min-w-[40px]">{{ formatTime(playerState?.duration || 0) }}</span>
+                    </div>
+
+                    <!-- Volume Control -->
+                    <div class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-5 h-5 text-gray-400">
+                            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+                        </svg>
+                        <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            [value]="playerState?.volume || 20"
+                            (input)="onVolumeChange($event)"
+                            class="w-24 h-2 accent-white bg-gray-800 rounded-lg appearance-none"
+                        />
+                    </div>
+                </div>
+
+                <!-- Open track modal button -->
+                <div class="flex items-center gap-4">
+                    <button
+                        (click)="openTrackModal()"
+                        class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-700 hover:from-emerald-600 hover:to-emerald-800 text-white rounded-xl text-sm font-semibold uppercase tracking-wider shadow-lg transition-all duration-200 hover:scale-105"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+                        </svg>
+                        <span>Open Player</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>

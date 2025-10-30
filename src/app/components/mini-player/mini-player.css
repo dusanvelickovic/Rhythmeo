@@ -12,3 +12,25 @@
 .animate-in {
     animation: slide-in-from-bottom 0.3s ease-out;
 }
+
+.slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #10b981;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #10b981;
+    cursor: pointer;
+    border: none;
+}
+
+.slider::-webkit-slider-runnable-track {
+    background: linear-gradient(to right, #10b981 0%, #10b981 var(--value, 0%), #374151 var(--value, 0%), #374151 100%);
+}

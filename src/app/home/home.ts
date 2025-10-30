@@ -131,22 +131,15 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
         setTimeout(() => {
             const swiperEl = this.getSwiperElement();
             if (swiperEl?.swiper) {
-                console.log('Next - realIndex before:', swiperEl.swiper.realIndex);
-                console.log('Next - activeIndex before:', swiperEl.swiper.activeIndex);
-
                 // Force enable sliding
                 swiperEl.swiper.allowSlideNext = true;
                 swiperEl.swiper.allowSlidePrev = true;
 
                 // Update swiper if needed
                 swiperEl.swiper.update();
-
-                const result = swiperEl.swiper.slideNext();
-                console.log('slideNext result:', result);
+                swiperEl.swiper.slideNext();
 
                 setTimeout(() => {
-                    console.log('Next - realIndex after:', swiperEl.swiper.realIndex);
-                    console.log('Next - activeIndex after:', swiperEl.swiper.activeIndex);
                 }, 100);
             }
         }, 50);
