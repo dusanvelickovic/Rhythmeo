@@ -9,7 +9,7 @@ import * as SpotifyActions from '../store/spotify/spotify.actions';
 import * as SpotifySelectors from '../store/spotify/spotify.selectors';
 import * as SpotifySearchSelectors from '../store/spotify-search/spotify-search.selectors';
 import * as PlayerSelectors from '../store/player/player.selectors';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, combineLatest, map } from 'rxjs';
 
 @Component({
     selector: 'app-home',
@@ -43,40 +43,31 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
     ngOnInit() {
         this.store.dispatch(SpotifyActions.loadTopTracks());
 
-        this.store.select(SpotifySelectors.selectTopTracks)
-            .pipe(takeUntil(this.destroy$))
-            .subscribe(tracks => {
-                if (!this.isSearchMode()) {
-                    this.tracks.set(tracks);
-                }
-            });
-
-        this.store.select(SpotifySelectors.selectTopTracksLoading)
-            .pipe(takeUntil(this.destroy$))
-            .subscribe(loading => {
-                if (!this.isSearchMode()) {
-                    this.isLoading.set(loading);
-                }
-            });
-
-        this.store.select(SpotifySearchSelectors.selectSearchResults)
-            .pipe(takeUntil(this.destroy$))
-            .subscribe(searchResults => {
-                if (searchResults.length > 0) {
-                    this.isSearchMode.set(true);
-                    this.tracks.set(searchResults);
-                } else if (this.isSearchMode()) {
-                    this.isSearchMode.set(false);
-                }
-            });
-
-        this.store.select(SpotifySearchSelectors.selectSearchLoading)
-            .pipe(takeUntil(this.destroy$))
-            .subscribe(loading => {
-                if (this.isSearchMode()) {
-                    this.isLoading.set(loading);
-                }
-            });
+        combineLatest([
+            this.store.select(SpotifySelectors.selectTopTracks),
+            this.store.select(SpotifySelectors.selectTopTracksLoading),
+            this.store.select(SpotifySearchSelectors.selectSearchResults),
+            this.store.select(SpotifySearchSelectors.selectSearchLoading)
+        ]).pipe(
+            takeUntil(this.destroy$),
+            map(([topTracks, topTracksLoading, searchResults, searchLoading]) => ({
+                topTracks,
+                topTracksLoading,
+                searchResults,
+                searchLoading,
+                isSearchMode: searchResults.length > 0
+            }))
+        ).subscribe(({ topTracks, topTracksLoading, searchResults, searchLoading, isSearchMode }) => {
+            this.isSearchMode.set(isSearchMode);
+            
+            if (isSearchMode) {
+                this.tracks.set(searchResults);
+                this.isLoading.set(searchLoading);
+            } else {
+                this.tracks.set(topTracks);
+                this.isLoading.set(topTracksLoading);
+            }
+        });
     }
 
     ngAfterViewInit() {
