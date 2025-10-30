@@ -16,10 +16,10 @@
 
     <!-- Loading State -->
     @if (isLoading()) {
-        <div class="flex items-center justify-center py-20">
+        <div class="w-full mx-auto min-h-auto text-white absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
             <div class="flex flex-col items-center space-y-4">
                 <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-emerald-500"></div>
-                <p class="text-gray-400 text-lg">Loading playlists...</p>
+                <p class="text-gray-400 text-lg">Loading...</p>
             </div>
         </div>
     }

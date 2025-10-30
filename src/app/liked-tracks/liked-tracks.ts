@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, signal, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
-import { Subject, takeUntil, filter, distinctUntilChanged, map } from 'rxjs';
+import { Subject, takeUntil, filter, distinctUntilChanged, map, combineLatest } from 'rxjs';
 import { Track } from '../core/types/track';
 import { TrackModal } from '../components/track-modal/track-modal';
 import { MiniPlayer } from '../components/mini-player/mini-player';
@@ -58,8 +58,14 @@ export class LikedTracks implements OnInit, OnDestroy, AfterViewChecked {
                 this.tracks.set(tracks);
             });
 
-        this.store.select(LikedTracksSelectors.selectLikedTracksLoading)
-            .pipe(takeUntil(this.destroy$))
+        combineLatest([
+            this.store.select(LikedTracksSelectors.selectLikedTracksLoading),
+            this.store.select(SpotifySelectors.selectTracksLoading)
+        ])
+            .pipe(
+                takeUntil(this.destroy$),
+                map(([likedTracksLoading, tracksLoading]) => likedTracksLoading || tracksLoading)
+            )
             .subscribe(loading => {
                 this.isLoading.set(loading);
             });
