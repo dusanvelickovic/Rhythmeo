@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { filter, take } from 'rxjs/operators';
+import { filter, take, switchMap, tap } from 'rxjs/operators';
+import { Subject, takeUntil } from 'rxjs';
 import * as AuthSelectors from '../store/auth/auth.selectors';
 import * as AuthActions from '../store/auth/auth.actions';
 
@@ -39,7 +40,9 @@ import * as AuthActions from '../store/auth/auth.actions';
     }
   `]
 })
-export class AuthCallback implements OnInit {
+export class AuthCallback implements OnInit, OnDestroy {
+    private destroy$ = new Subject<void>();
+
     constructor(
         private route: ActivatedRoute,
         private router: Router,
@@ -47,29 +50,37 @@ export class AuthCallback implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.route.queryParams.subscribe(params => {
-            const token = params['token'];
-
-            if (token) {
-                this.store.dispatch(AuthActions.handleLoginCallback({ token }));
-
-                this.store.select(AuthSelectors.selectAuthLoading).pipe(
-                    filter(loading => !loading),
-                    take(1)
-                ).subscribe(() => {
-                    this.store.select(AuthSelectors.selectIsAuthenticated).pipe(
-                        take(1)
-                    ).subscribe(isAuthenticated => {
-                        if (isAuthenticated) {
-                            this.router.navigate(['/home']);
-                        } else {
-                            this.router.navigate(['/error']);
-                        }
-                    });
-                });
+        this.route.queryParams.pipe(
+            take(1),
+            tap(params => {
+                const token = params['token'];
+                if (token) {
+                    this.store.dispatch(AuthActions.handleLoginCallback({ token }));
+                } else {
+                    this.router.navigate(['/login']);
+                    return;
+                }
+            }),
+            filter(params => !!params['token']),
+            switchMap(() => this.store.select(AuthSelectors.selectAuthLoading).pipe(
+                filter(loading => !loading),
+                take(1)
+            )),
+            switchMap(() => this.store.select(AuthSelectors.selectIsAuthenticated).pipe(
+                take(1)
+            )),
+            takeUntil(this.destroy$)
+        ).subscribe(isAuthenticated => {
+            if (isAuthenticated) {
+                this.router.navigate(['/home']);
             } else {
-                this.router.navigate(['/login']);
+                this.router.navigate(['/error']);
             }
         });
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 }
