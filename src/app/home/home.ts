@@ -124,9 +124,6 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
         // Get actual index in tracks array (with wrap around for infinite scroll)
         const actualIndex = this.getActualIndexInTracksArray();
 
-        console.log('Next - currentTrackIndex:', this.currentTrackIndex);
-        console.log('Next - actualIndex:', actualIndex);
-
         this.selectedTrack.set(this.tracks()[actualIndex]);
         this.updateNextAndPreviousTracks(actualIndex);
 
