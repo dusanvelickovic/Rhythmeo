@@ -1,4 +1,4 @@
-import {Component, Input, OnDestroy, OnInit, OnChanges, SimpleChanges, Output, EventEmitter, signal} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit, OnChanges, SimpleChanges, Output, EventEmitter, signal, HostListener} from '@angular/core';
 import {interval, Subject, takeUntil, Observable} from 'rxjs';
 import {Track} from '../../core/types/track';
 import { Store } from '@ngrx/store';
@@ -48,6 +48,19 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
      */
     toggleVolumeSlider(): void {
         this.showVolumeSlider.set(!this.showVolumeSlider());
+    }
+
+    /**
+     * Close volume slider on outside click
+     */
+    @HostListener('document:click', ['$event'])
+    onDocumentClick(event: MouseEvent): void {
+        const target = event.target as HTMLElement;
+        const volumeControl = target.closest('.volume-control-container');
+        
+        if (!volumeControl && this.showVolumeSlider()) {
+            this.showVolumeSlider.set(false);
+        }
     }
 
     ngOnChanges(changes: SimpleChanges): void {
