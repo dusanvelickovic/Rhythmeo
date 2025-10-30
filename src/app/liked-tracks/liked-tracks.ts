@@ -4,15 +4,17 @@ import { Store } from '@ngrx/store';
 import { Subject, takeUntil, combineLatest, filter, distinctUntilChanged, map } from 'rxjs';
 import { Track } from '../core/types/track';
 import { TrackModal } from '../components/track-modal/track-modal';
+import { MiniPlayer } from '../components/mini-player/mini-player';
 import * as SpotifyActions from '../store/spotify/spotify.actions';
 import * as SpotifySelectors from '../store/spotify/spotify.selectors';
 import * as LikedTracksActions from '../store/liked-tracks';
 import * as LikedTracksSelectors from '../store/liked-tracks';
 import {RouterLink} from '@angular/router';
+import * as PlayerSelectors from '../store/player/player.selectors';
 
 @Component({
   selector: 'app-liked-tracks',
-    imports: [CommonModule, TrackModal, RouterLink],
+    imports: [CommonModule, TrackModal, MiniPlayer, RouterLink],
   templateUrl: './liked-tracks.html',
   styleUrl: './liked-tracks.css'
 })
@@ -98,6 +100,25 @@ export class LikedTracks implements OnInit, OnDestroy, AfterViewChecked {
 
     closeTrackModal() {
         this.isTrackModalOpen.set(false);
+    }
+
+    /**
+     * Handle click on mini player to open track modal
+     */
+    onMiniPlayerClicked() {
+        this.store.select(PlayerSelectors.selectPlayerState)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(playerState => {
+                if (playerState?.current_track) {
+                    this.selectedTrack.set(playerState.current_track);
+                    const index = this.tracks().findIndex(t => t.id === playerState.current_track?.id);
+                    if (index !== -1) {
+                        this.currentTrackIndex = index;
+                        this.updateNextAndPreviousTracks(index);
+                    }
+                    this.isTrackModalOpen.set(true);
+                }
+            }).unsubscribe();
     }
 
     ngAfterViewChecked(): void {

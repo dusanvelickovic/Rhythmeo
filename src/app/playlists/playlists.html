@@ -80,3 +80,14 @@
         </div>
     }
 </div>
+
+@if (isTrackModalOpen()) {
+    <app-track-modal
+        [track]="selectedTrack()"
+        [nextTracks]="[]"
+        [previousTracks]="[]"
+        (modalClosed)="closeTrackModal()"
+    ></app-track-modal>
+}
+
+<app-mini-player [isModalOpen]="isTrackModalOpen()" (trackClicked)="onMiniPlayerClicked()"></app-mini-player>

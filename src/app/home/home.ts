@@ -3,16 +3,18 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA, signal, ViewChild, ElementRef, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Track } from '../core/types/track';
 import { TrackModal } from '../components/track-modal/track-modal';
+import { MiniPlayer } from '../components/mini-player/mini-player';
 import { Store } from '@ngrx/store';
 import * as SpotifyActions from '../store/spotify/spotify.actions';
 import * as SpotifySelectors from '../store/spotify/spotify.selectors';
 import * as SpotifySearchSelectors from '../store/spotify-search/spotify-search.selectors';
+import * as PlayerSelectors from '../store/player/player.selectors';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'app-home',
     standalone: true,
-    imports: [CommonModule, TrackModal],
+    imports: [CommonModule, TrackModal, MiniPlayer],
     templateUrl: './home.html',
     styleUrls: ['./home.css'],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -204,6 +206,26 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
 
     closeTrackModal() {
         this.isTrackModalOpen.set(false);
+    }
+
+    /**
+     * Handle click on mini player to open track modal
+     */
+    onMiniPlayerClicked() {
+        this.store.select(PlayerSelectors.selectPlayerState)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(playerState => {
+                if (playerState?.current_track) {
+                    this.selectedTrack.set(playerState.current_track);
+                    const index = this.tracks().findIndex(t => t.id === playerState.current_track?.id);
+                    if (index !== -1) {
+                        this.initialTrackIndex = index;
+                        this.currentTrackIndex = 0;
+                        this.updateNextAndPreviousTracks(index);
+                    }
+                    this.isTrackModalOpen.set(true);
+                }
+            }).unsubscribe();
     }
 
     ngOnDestroy(): void {

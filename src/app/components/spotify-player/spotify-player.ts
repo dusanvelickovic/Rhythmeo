@@ -68,16 +68,24 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
         if (changes['track'] && changes['track'].currentValue) {
             this.updateLikedStatusObservable();
 
-            // Check player state from store directly since local playerState may not be initialized yet
-            this.playerState$.pipe(
-                takeUntil(this.destroy$)
-            ).subscribe(state => {
-                // If there was a track playing before, immediately play the new track
-                if (state?.current_track && !state.paused) {
-                    this.songWasPlayed = true;
-                    this.store.dispatch(PlayerActions.play({ uri: changes['track'].currentValue.uri }));
-                }
-            }).unsubscribe();
+            // Check if the track URI actually changed from previous value
+            const previousTrack = changes['track'].previousValue;
+            const currentTrack = changes['track'].currentValue;
+            const trackChanged = !previousTrack || previousTrack.uri !== currentTrack.uri;
+
+            // Only auto-play if it's a different track
+            if (trackChanged) {
+                // Check player state from store directly since local playerState may not be initialized yet
+                this.playerState$.pipe(
+                    takeUntil(this.destroy$)
+                ).subscribe(state => {
+                    // If there was a track playing before AND it's a different track from what's in the store
+                    if (state?.current_track && !state.paused && state.current_track.uri !== currentTrack.uri) {
+                        this.songWasPlayed = true;
+                        this.store.dispatch(PlayerActions.play({ uri: currentTrack.uri }));
+                    }
+                }).unsubscribe();
+            }
         }
     }
 
@@ -101,6 +109,11 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
         ).subscribe(result => {
             if (result.type === 'state') {
                 this.playerState = result.data;
+                
+                // If the current track in store matches our track and is playing, mark as played
+                if (this.playerState?.current_track?.uri === this.track?.uri && !this.playerState.paused) {
+                    this.songWasPlayed = true;
+                }
             } else if (result.type === 'ready') {
                 this.isReady = result.data;
             } else if (result.type === 'volume') {

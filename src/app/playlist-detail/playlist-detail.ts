@@ -7,16 +7,18 @@ import { Subject, takeUntil } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Track } from '../core/types/track';
 import { TrackModal } from '../components/track-modal/track-modal';
+import { MiniPlayer } from '../components/mini-player/mini-player';
 import * as SpotifyActions from '../store/spotify/spotify.actions';
 import * as SpotifySelectors from '../store/spotify/spotify.selectors';
 import * as PlaylistActions from '../store/playlist/playlist.actions';
 import { selectPlaylistById } from '../store/playlist/playlist.selectors';
 import { Playlist } from '../store/playlist/playlist.state';
+import * as PlayerSelectors from '../store/player/player.selectors';
 
 @Component({
     selector: 'app-playlist-detail',
     standalone: true,
-    imports: [CommonModule, FormsModule, TrackModal, RouterLink],
+    imports: [CommonModule, FormsModule, TrackModal, MiniPlayer, RouterLink],
     templateUrl: './playlist-detail.html',
 })
 export class PlaylistDetail implements OnInit, OnDestroy {
@@ -145,6 +147,25 @@ export class PlaylistDetail implements OnInit, OnDestroy {
      */
     closeTrackModal() {
         this.isTrackModalOpen.set(false);
+    }
+
+    /**
+     * Handle mini player click to open track modal
+     */
+    onMiniPlayerClicked() {
+        this.store.select(PlayerSelectors.selectPlayerState)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(playerState => {
+                if (playerState?.current_track) {
+                    this.selectedTrack.set(playerState.current_track);
+                    const index = this.tracks().findIndex(t => t.id === playerState.current_track?.id);
+                    if (index !== -1) {
+                        this.currentTrackIndex = index;
+                        this.updateNextAndPreviousTracks(index);
+                    }
+                    this.isTrackModalOpen.set(true);
+                }
+            }).unsubscribe();
     }
 
     /**

@@ -54,3 +54,5 @@
         (previousTrackRequested)="onPreviousTrackRequested()"
     ></app-track-modal>
 }
+
+<app-mini-player [isModalOpen]="isTrackModalOpen()" (trackClicked)="onMiniPlayerClicked()"></app-mini-player>
