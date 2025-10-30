@@ -3,7 +3,7 @@
         <a routerLink="/home" class="text-white text-xl font-bold uppercase tracking-wider">Rhythmeo</a>
 
         <!-- Links to favorites, playlists -->
-        <div>
+        <div class="flex items-center">
             <a
               routerLink="/favorites"
               routerLinkActive="text-xl text-white"
@@ -20,6 +20,9 @@
             >
                 Playlists
             </a>
+            
+            <!-- Song Search -->
+            <app-spotify-search (searchRequested)="onSearchRequested($event)"></app-spotify-search>
         </div>
 
         <a routerLink="/profile" class="text-gray-300 hover:text-white mx-4">

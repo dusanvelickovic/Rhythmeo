@@ -1,14 +1,33 @@
 import { Component } from '@angular/core';
-import {RouterLink, RouterLinkActive} from "@angular/router";
+import {Router, RouterLink, RouterLinkActive} from "@angular/router";
+import {SearchParams, SpotifySearch} from '../spotify-search/spotify-search';
+import { Store } from '@ngrx/store';
+import * as SpotifySearchActions from '../../store/spotify-search/spotify-search.actions';
 
 @Component({
   selector: 'app-navigation',
     imports: [
         RouterLink,
-        RouterLinkActive
+        RouterLinkActive,
+        SpotifySearch
     ],
   templateUrl: './navigation.html',
 })
 export class Navigation {
+    constructor(
+        private router: Router,
+        private store: Store
+    ) {}
 
+    /**
+     * Handle search requests from SpotifySearch component
+     */
+    onSearchRequested(params: SearchParams) {
+        const query = params.type === 'genre' ? `genre:${params.value}` : params.value;
+        this.store.dispatch(SpotifySearchActions.searchSpotify({ query, searchType: 'track' }));
+
+        if (this.router.url !== '/home') {
+            this.router.navigate(['/home']);
+        }
+    }
 }

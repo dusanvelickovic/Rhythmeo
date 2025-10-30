@@ -7,6 +7,7 @@ import { Store } from '@ngrx/store';
 import * as PlayerActions from '../store/player/player.actions';
 import * as SpotifyActions from '../store/spotify/spotify.actions';
 import * as SpotifySelectors from '../store/spotify/spotify.selectors';
+import * as SpotifySearchSelectors from '../store/spotify-search/spotify-search.selectors';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
@@ -24,6 +25,7 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
     tracks = signal<Track[]>([]);
     isLoading = signal(false);
     isTrackModalOpen = signal(false);
+    isSearchMode = signal(false);
 
     // Tracks
     selectedTrack = signal<Track | null>(null);
@@ -43,13 +45,34 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
         this.store.select(SpotifySelectors.selectTopTracks)
             .pipe(takeUntil(this.destroy$))
             .subscribe(tracks => {
-                this.tracks.set(tracks);
+                if (!this.isSearchMode()) {
+                    this.tracks.set(tracks);
+                }
             });
 
         this.store.select(SpotifySelectors.selectTopTracksLoading)
             .pipe(takeUntil(this.destroy$))
             .subscribe(loading => {
-                this.isLoading.set(loading);
+                if (!this.isSearchMode()) {
+                    this.isLoading.set(loading);
+                }
+            });
+
+        this.store.select(SpotifySearchSelectors.selectSearchResults)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(searchResults => {
+                if (searchResults.length > 0) {
+                    this.isSearchMode.set(true);
+                    this.tracks.set(searchResults);
+                }
+            });
+
+        this.store.select(SpotifySearchSelectors.selectSearchLoading)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(loading => {
+                if (this.isSearchMode()) {
+                    this.isLoading.set(loading);
+                }
             });
     }
 
@@ -94,13 +117,13 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
     onNextTrackRequested() {
         // Increment relative to modal (starts from 0)
         this.currentTrackIndex++;
-        
+
         // Get actual index in tracks array (with wrap around for infinite scroll)
         const actualIndex = this.getActualIndexInTracksArray();
-        
+
         console.log('Next - currentTrackIndex:', this.currentTrackIndex);
         console.log('Next - actualIndex:', actualIndex);
-        
+
         this.selectedTrack.set(this.tracks()[actualIndex]);
         this.updateNextAndPreviousTracks(actualIndex);
 
@@ -110,17 +133,17 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
             if (swiperEl?.swiper) {
                 console.log('Next - realIndex before:', swiperEl.swiper.realIndex);
                 console.log('Next - activeIndex before:', swiperEl.swiper.activeIndex);
-                
+
                 // Force enable sliding
                 swiperEl.swiper.allowSlideNext = true;
                 swiperEl.swiper.allowSlidePrev = true;
-                
+
                 // Update swiper if needed
                 swiperEl.swiper.update();
 
                 const result = swiperEl.swiper.slideNext();
                 console.log('slideNext result:', result);
-                
+
                 setTimeout(() => {
                     console.log('Next - realIndex after:', swiperEl.swiper.realIndex);
                     console.log('Next - activeIndex after:', swiperEl.swiper.activeIndex);

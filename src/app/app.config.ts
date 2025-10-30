@@ -15,6 +15,7 @@ import { playerReducer, PlayerEffects } from './store/player';
 import { likedTracksReducer, LikedTracksEffects } from './store/liked-tracks';
 import { spotifyReducer, SpotifyEffects } from './store/spotify';
 import { playlistReducer, PlaylistEffects } from './store/playlist';
+import { spotifySearchReducer, SpotifySearchEffects } from './store/spotify-search';
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -27,8 +28,9 @@ export const appConfig: ApplicationConfig = {
             player: playerReducer, 
             likedTracks: likedTracksReducer, 
             spotify: spotifyReducer,
-            playlist: playlistReducer 
+            playlist: playlistReducer,
+            spotifySearch: spotifySearchReducer
         }),
-        provideEffects([AuthEffects, PlayerEffects, LikedTracksEffects, SpotifyEffects, PlaylistEffects]),
+        provideEffects([AuthEffects, PlayerEffects, LikedTracksEffects, SpotifyEffects, PlaylistEffects, SpotifySearchEffects]),
     ],
 };

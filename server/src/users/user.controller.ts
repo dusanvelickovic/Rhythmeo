@@ -1,7 +1,8 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { User } from './user.entity';
 import {JwtAuthGuard} from '../auth/guards/jwt-auth.guard';
 import {UsersService} from './users.service';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
 @Controller('users')
 export class UserController {
@@ -12,8 +13,8 @@ export class UserController {
      */
     @Get('me')
     @UseGuards(JwtAuthGuard)
-    async getCurrentUser(@Req() req): Promise<User> {
-        const user = await this.userService.findBySpotifyId(req.user.spotifyId);
+    async getCurrentUser(@CurrentUser('spotifyId') spotifyId: string): Promise<User> {
+        const user = await this.userService.findBySpotifyId(spotifyId);
         // Exclude sensitive fields
         delete user.spotifyId;
         delete user.accessToken;

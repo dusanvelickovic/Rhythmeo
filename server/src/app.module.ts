@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { SpotifyModule } from './spotify/spotify.module';
+import { SpotifySearchModule } from './spotify-search/spotify-search.module';
 import { LikedTracksModule } from './liked-tracks/liked-tracks.module';
 import { PlaylistModule } from './playlist/playlist.module';
 import { PlaylistTrackModule } from './playlist-track/playlist-track.module';
@@ -38,6 +39,7 @@ import { PlaylistTrackModule } from './playlist-track/playlist-track.module';
         AuthModule,
         UsersModule,
         SpotifyModule,
+        SpotifySearchModule,
         LikedTracksModule,
         PlaylistModule,
         PlaylistTrackModule,
