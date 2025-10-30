@@ -1,5 +1,6 @@
 import {Component, Input, OnDestroy, OnInit, OnChanges, SimpleChanges, Output, EventEmitter, signal, HostListener} from '@angular/core';
-import {interval, Subject, takeUntil, Observable} from 'rxjs';
+import {interval, Subject, takeUntil, Observable, merge} from 'rxjs';
+import {map} from 'rxjs/operators';
 import {Track} from '../../core/types/track';
 import { Store } from '@ngrx/store';
 import * as PlayerActions from '../../store/player/player.actions';
@@ -74,26 +75,28 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
         // Load liked tracks on init
         this.store.dispatch(LikedTracksActions.loadLikedTracks());
 
-        // Subscribe to player state from store
-        this.playerState$
-            .pipe(takeUntil(this.destroy$))
-            .subscribe((state) => {
-                this.playerState = state;
-            });
-
-        // Subscribe to ready state from store
-        this.isReady$
-            .pipe(takeUntil(this.destroy$))
-            .subscribe((ready) => {
-                this.isReady = ready;
-            });
-
-        // Subscribe to volume from store
-        this.volume$
-            .pipe(takeUntil(this.destroy$))
-            .subscribe((volume) => {
-                this.volume = volume;
-            });
+        // Merge player-related store selectors into a single subscription
+        merge(
+            this.playerState$.pipe(
+                map(state => ({ type: 'state' as const, data: state }))
+            ),
+            this.isReady$.pipe(
+                map(ready => ({ type: 'ready' as const, data: ready }))
+            ),
+            this.volume$.pipe(
+                map(volume => ({ type: 'volume' as const, data: volume }))
+            )
+        ).pipe(
+            takeUntil(this.destroy$)
+        ).subscribe(result => {
+            if (result.type === 'state') {
+                this.playerState = result.data;
+            } else if (result.type === 'ready') {
+                this.isReady = result.data;
+            } else if (result.type === 'volume') {
+                this.volume = result.data;
+            }
+        });
 
         // Set up liked status observable
         if (this.track?.id) {

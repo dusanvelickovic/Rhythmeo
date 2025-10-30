@@ -5,7 +5,8 @@ import { loadPlaylists, createPlaylist, addTrackToPlaylist } from '../../store/p
 import { selectAllPlaylists, selectPlaylistsLoading } from '../../store/playlist/playlist.selectors';
 import { Actions, ofType } from '@ngrx/effects';
 import * as PlaylistActions from '../../store/playlist/playlist.actions';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, merge } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export interface Playlist {
     id: number;
@@ -39,44 +40,42 @@ export class AddToPlaylist implements OnInit, OnChanges, OnDestroy {
     newPlaylistName = signal('');
 
     ngOnInit(): void {
-        // Subscribe to playlists from store
-        this.store.select(selectAllPlaylists)
-            .pipe(takeUntil(this.destroy$))
-            .subscribe(playlists => {
-                // Create a new array reference to ensure signal detects the change
-                this.playlists.set([...playlists] as Playlist[]);
-            });
-
-        this.store.select(selectPlaylistsLoading)
-            .pipe(takeUntil(this.destroy$))
-            .subscribe(loading => {
-                this.isLoading.set(loading);
-            });
-
-        // Subscribe to add track success once
-        this.actions$.pipe(
-            ofType(PlaylistActions.addTrackToPlaylistSuccess),
+        // Merge store selectors and actions into a single subscription
+        merge(
+            this.store.select(selectAllPlaylists).pipe(
+                map(playlists => ({ type: 'playlists' as const, data: playlists }))
+            ),
+            this.store.select(selectPlaylistsLoading).pipe(
+                map(loading => ({ type: 'loading' as const, data: loading }))
+            ),
+            this.actions$.pipe(
+                ofType(PlaylistActions.addTrackToPlaylistSuccess),
+                map(action => ({ type: 'addTrackSuccess' as const, data: action }))
+            ),
+            this.actions$.pipe(
+                ofType(PlaylistActions.createPlaylistSuccess),
+                map(action => ({ type: 'createPlaylistSuccess' as const, data: action }))
+            )
+        ).pipe(
             takeUntil(this.destroy$)
-        ).subscribe((action) => {
-            // Only react if this component initiated the action
-            if (this.pendingPlaylistId === action.playlistId && this.trackId === action.trackId) {
-                this.addToPlaylist.emit(action.playlistId);
-                this.pendingPlaylistId = null;
-                this.onClose();
-            }
-        });
-
-        // Subscribe to create playlist success once
-        this.actions$.pipe(
-            ofType(PlaylistActions.createPlaylistSuccess),
-            takeUntil(this.destroy$)
-        ).subscribe(({ playlist }) => {
-            this.showCreateForm.set(false);
-            this.newPlaylistName.set('');
-
-            // If trackId is set, add the track to the newly created playlist
-            if (this.trackId) {
-                this.onAddToPlaylist(playlist.id);
+        ).subscribe(result => {
+            if (result.type === 'playlists') {
+                this.playlists.set([...result.data] as Playlist[]);
+            } else if (result.type === 'loading') {
+                this.isLoading.set(result.data);
+            } else if (result.type === 'addTrackSuccess') {
+                const action = result.data;
+                if (this.pendingPlaylistId === action.playlistId && this.trackId === action.trackId) {
+                    this.addToPlaylist.emit(action.playlistId);
+                    this.pendingPlaylistId = null;
+                    this.onClose();
+                }
+            } else if (result.type === 'createPlaylistSuccess') {
+                this.showCreateForm.set(false);
+                this.newPlaylistName.set('');
+                if (this.trackId) {
+                    this.onAddToPlaylist(result.data.playlist.id);
+                }
             }
         });
     }
