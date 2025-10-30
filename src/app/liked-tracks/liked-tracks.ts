@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, signal, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
-import { Subject, takeUntil, combineLatest, filter, distinctUntilChanged, map } from 'rxjs';
+import { Subject, takeUntil, filter, distinctUntilChanged, map } from 'rxjs';
 import { Track } from '../core/types/track';
 import { TrackModal } from '../components/track-modal/track-modal';
 import { MiniPlayer } from '../components/mini-player/mini-player';

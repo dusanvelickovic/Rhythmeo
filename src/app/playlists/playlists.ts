@@ -2,8 +2,7 @@ import { Component, OnInit, OnDestroy, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Subject, takeUntil, merge } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Subject, takeUntil, combineLatest } from 'rxjs';
 import { loadPlaylists, deletePlaylist } from '../store/playlist/playlist.actions';
 import { selectAllPlaylists, selectPlaylistsLoading } from '../store/playlist/playlist.selectors';
 import { Playlist } from '../store/playlist/playlist.state';
@@ -36,29 +35,19 @@ export class Playlists implements OnInit, OnDestroy {
         // Load playlists on component init
         this.store.dispatch(loadPlaylists());
 
-        // Merge multiple store selectors into a single subscription
-        merge(
-            this.store.select(selectAllPlaylists).pipe(
-                map(playlists => ({ type: 'playlists' as const, data: playlists }))
-            ),
-            this.store.select(selectPlaylistsLoading).pipe(
-                map(loading => ({ type: 'loading' as const, data: loading }))
-            ),
-            this.store.select(PlayerSelectors.selectPlayerState).pipe(
-                map(playerState => ({ type: 'playerState' as const, data: playerState }))
-            )
-        ).pipe(
+        // Combine multiple store selectors into a single subscription
+        combineLatest([
+            this.store.select(selectAllPlaylists),
+            this.store.select(selectPlaylistsLoading),
+            this.store.select(PlayerSelectors.selectPlayerState)
+        ]).pipe(
             takeUntil(this.destroy$)
-        ).subscribe(result => {
-            if (result.type === 'playlists') {
-                this.playlists.set(result.data);
-            } else if (result.type === 'loading') {
-                this.isLoading.set(result.data);
-            } else if (result.type === 'playerState') {
-                // Update selected track from player state if not set
-                if (result.data?.current_track && !this.selectedTrack()) {
-                    this.selectedTrack.set(result.data.current_track);
-                }
+        ).subscribe(([playlists, loading, playerState]) => {
+            this.playlists.set(playlists);
+            this.isLoading.set(loading);
+            // Update selected track from player state if not set
+            if (playerState?.current_track && !this.selectedTrack()) {
+                this.selectedTrack.set(playerState.current_track);
             }
         });
     }
