@@ -1,9 +1,9 @@
-import { Component, signal, output } from '@angular/core';
+import { Component, signal, output, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 export interface SearchParams {
-    type: 'genre' | 'custom';
+    type: 'genre' | 'custom' | 'reset';
     value: string;
 }
 
@@ -22,6 +22,16 @@ export class SpotifySearch {
     customQuery = signal<string>('');
     searchMode = signal<'genre' | 'custom'>('genre');
     isExpanded = signal<boolean>(false);
+
+    @HostListener('document:click', ['$event'])
+    onDocumentClick(event: MouseEvent) {
+        const target = event.target as HTMLElement;
+        const clickedInside = target.closest('.spotify-search-container');
+        
+        if (!clickedInside && this.isExpanded()) {
+            this.isExpanded.set(false);
+        }
+    }
 
     /**
      * Select a genre and emit search request
@@ -92,5 +102,16 @@ export class SpotifySearch {
      */
     toggleSearch() {
         this.isExpanded.set(!this.isExpanded());
+    }
+
+    /**
+     * Reset search settings and fallback to top tracks
+     */
+    resetSearch() {
+        this.selectedGenre.set(null);
+        this.customQuery.set('');
+        this.searchMode.set('genre');
+        this.isExpanded.set(false);
+        this.searchRequested.emit({ type: 'reset', value: '' });
     }
 }

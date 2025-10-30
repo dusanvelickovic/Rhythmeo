@@ -3,6 +3,7 @@ import {Router, RouterLink, RouterLinkActive} from "@angular/router";
 import {SearchParams, SpotifySearch} from '../spotify-search/spotify-search';
 import { Store } from '@ngrx/store';
 import * as SpotifySearchActions from '../../store/spotify-search/spotify-search.actions';
+import * as SpotifyActions from '../../store/spotify/spotify.actions';
 
 @Component({
   selector: 'app-navigation',
@@ -23,8 +24,13 @@ export class Navigation {
      * Handle search requests from SpotifySearch component
      */
     onSearchRequested(params: SearchParams) {
-        const query = params.type === 'genre' ? `genre:${params.value}` : params.value;
-        this.store.dispatch(SpotifySearchActions.searchSpotify({ query, searchType: 'track' }));
+        if (params.type === 'reset') {
+            this.store.dispatch(SpotifySearchActions.clearSearchResults());
+            this.store.dispatch(SpotifyActions.loadTopTracks());
+        } else {
+            const query = params.type === 'genre' ? `genre:${params.value}` : params.value;
+            this.store.dispatch(SpotifySearchActions.searchSpotify({ query, searchType: 'track' }));
+        }
 
         if (this.router.url !== '/home') {
             this.router.navigate(['/home']);

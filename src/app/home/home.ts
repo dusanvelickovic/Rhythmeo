@@ -64,6 +64,8 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
                 if (searchResults.length > 0) {
                     this.isSearchMode.set(true);
                     this.tracks.set(searchResults);
+                } else if (this.isSearchMode()) {
+                    this.isSearchMode.set(false);
                 }
             });
 
