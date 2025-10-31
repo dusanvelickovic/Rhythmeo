@@ -109,7 +109,7 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
         ).subscribe(result => {
             if (result.type === 'state') {
                 this.playerState = result.data;
-                
+
                 // If the current track in store matches our track and is playing, mark as played
                 if (this.playerState?.current_track?.uri === this.track?.uri && !this.playerState.paused) {
                     this.songWasPlayed = true;
@@ -136,7 +136,7 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
                         this.playerState.duration
                     );
                     this.store.dispatch(PlayerActions.updatePosition({ position: newPosition }));
-                    
+
                     // Check if song has ended and play next track if available
                     if (newPosition >= this.playerState.duration && this.nextTrackUri) {
                         this.nextTrack();
@@ -156,12 +156,10 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
 
                 // Play the track
                 this.store.dispatch(PlayerActions.play({ uri: this.track?.uri }));
-                console.log('Playing:', this.track?.name);
             }
             else {
                 // Toggle play/pause
                 this.store.dispatch(PlayerActions.togglePlay());
-                console.log(this.playerState?.paused ? 'Paused' : 'Playing');
             }
 
         } catch (error) {

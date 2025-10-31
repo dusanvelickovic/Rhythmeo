@@ -45,8 +45,6 @@ export class SpotifyPlayerService {
      * Initialize the Spotify Player
      */
     async initializePlayer(): Promise<void> {
-        console.log('Initializing Spotify Player');
-
         return new Promise((resolve, reject) => {
             if (!window.Spotify) {
                 reject('Spotify SDK not loaded');
@@ -91,8 +89,6 @@ export class SpotifyPlayerService {
                 // Wait for the player to be ready
                 this.player.addListener('ready', ({device_id}) => {
                     this.ngZone.run(() => {
-                        console.log('Spotify Player Ready: ', device_id);
-
                         this.deviceId = device_id;
                         this.readySubject.next(true);
                         this.store.dispatch(PlayerActions.playerReady({ deviceId: device_id }));
@@ -128,11 +124,7 @@ export class SpotifyPlayerService {
                 });
 
                 // Connect the player
-                this.player.connect().then((success) => {
-                    if (success) {
-                        console.log('The Web Playback SDK successfully connected to Spotify!');
-                    }
-                });
+                this.player.connect();
 
             }).catch((error) => {
                 reject('Failed to get access token: ' + error);
@@ -145,8 +137,6 @@ export class SpotifyPlayerService {
      */
     async play(spotifyUri?: string): Promise<void> {
         const deviceId = this.getDeviceId();
-
-        console.log('Device ID:', deviceId);
 
         if (!deviceId) {
             throw new Error('Device not ready');
@@ -174,8 +164,6 @@ export class SpotifyPlayerService {
                     body: JSON.stringify(body),
                 }
             );
-
-            console.log(response);
 
             if (!response.ok) {
                 throw new Error('Failed to play');

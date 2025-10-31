@@ -22,7 +22,6 @@ export class App implements OnInit, OnDestroy{
 
     ngOnInit() {
         window.onSpotifyWebPlaybackSDKReady = () => {
-            console.log('Spotify Web Playback SDK is ready');
             this.initializePlayer();
         }
     }

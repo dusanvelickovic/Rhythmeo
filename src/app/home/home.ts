@@ -59,7 +59,7 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
             }))
         ).subscribe(({ topTracks, topTracksLoading, searchResults, searchLoading, isSearchMode }) => {
             this.isSearchMode.set(isSearchMode);
-            
+
             if (isSearchMode) {
                 this.tracks.set(searchResults);
                 this.isLoading.set(searchLoading);
@@ -75,10 +75,6 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
         setTimeout(() => {
             const swiperEl = this.getSwiperElement();
             if (swiperEl?.swiper) {
-                console.log('Swiper initialized');
-                console.log('Swiper params:', swiperEl.swiper.params);
-                console.log('Loop enabled:', swiperEl.swiper.params.loop);
-
                 // Initialize swiper properly
                 swiperEl.swiper.update();
             }

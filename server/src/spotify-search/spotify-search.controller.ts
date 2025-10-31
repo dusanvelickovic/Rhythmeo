@@ -19,9 +19,6 @@ export class SpotifySearchController {
         @Query('type') type: string = 'track',
         @Query('limit') limit: number = 20,
     ) {
-        console.log(query);
-        console.log(type);
-
         const result = await this.spotifySearchService.search(
             user.spotifyId,
             query,
