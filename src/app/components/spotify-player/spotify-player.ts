@@ -136,6 +136,11 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
                         this.playerState.duration
                     );
                     this.store.dispatch(PlayerActions.updatePosition({ position: newPosition }));
+                    
+                    // Check if song has ended and play next track if available
+                    if (newPosition >= this.playerState.duration && this.nextTrackUri) {
+                        this.nextTrack();
+                    }
                 }
             });
     }
