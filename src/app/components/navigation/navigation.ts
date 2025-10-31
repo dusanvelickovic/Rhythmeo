@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import {Router, RouterLink, RouterLinkActive} from "@angular/router";
 import {SearchParams, SpotifySearch} from '../spotify-search/spotify-search';
 import { Store } from '@ngrx/store';
@@ -15,10 +15,20 @@ import * as SpotifyActions from '../../store/spotify/spotify.actions';
   templateUrl: './navigation.html',
 })
 export class Navigation {
+    isMobileMenuOpen = signal(false);
+
     constructor(
         private router: Router,
         private store: Store
     ) {}
+
+    toggleMobileMenu() {
+        this.isMobileMenuOpen.set(!this.isMobileMenuOpen());
+    }
+
+    closeMobileMenu() {
+        this.isMobileMenuOpen.set(false);
+    }
 
     /**
      * Handle search requests from SpotifySearch component
@@ -35,5 +45,7 @@ export class Navigation {
         if (this.router.url !== '/home') {
             this.router.navigate(['/home']);
         }
+
+        this.closeMobileMenu();
     }
 }
