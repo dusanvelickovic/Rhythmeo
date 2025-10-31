@@ -3,6 +3,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { SpotifyModule } from './spotify/spotify.module';
@@ -16,6 +18,10 @@ import { PlaylistTrackModule } from './playlist-track/playlist-track.module';
         ConfigModule.forRoot({
             isGlobal: true,
             envFilePath: '.env',
+        }),
+        ServeStaticModule.forRoot({
+            rootPath: join(__dirname, '..', 'client'),
+            exclude: ['/api*'],
         }),
         TypeOrmModule.forRootAsync({
             imports: [ConfigModule],

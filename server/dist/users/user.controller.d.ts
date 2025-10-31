@@ -3,5 +3,5 @@ import { UsersService } from './users.service';
 export declare class UserController {
     private readonly userService;
     constructor(userService: UsersService);
-    getCurrentUser(req: any): Promise<User>;
+    getCurrentUser(spotifyId: string): Promise<User>;
 }

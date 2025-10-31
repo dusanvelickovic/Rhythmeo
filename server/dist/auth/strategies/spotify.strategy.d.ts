@@ -1,8 +1,6 @@
-import { Profile, Strategy } from 'passport-spotify';
+import { Profile } from 'passport-spotify';
 import { ConfigService } from '@nestjs/config';
-declare const SpotifyStrategy_base: new (...args: [options: import("passport-spotify").StrategyOptions] | [options: import("passport-spotify").StrategyOptionsWithRequest]) => Strategy & {
-    validate(...args: any[]): unknown;
-};
+declare const SpotifyStrategy_base: new (...args: any) => any;
 export declare class SpotifyStrategy extends SpotifyStrategy_base {
     private configService;
     constructor(configService: ConfigService);

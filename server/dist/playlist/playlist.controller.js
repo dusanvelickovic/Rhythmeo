@@ -40,6 +40,7 @@ let PlaylistController = class PlaylistController {
     }
     async deletePlaylist(req, id) {
         const userId = req.user.id;
+        await this.playlistTrackService.deleteTracksByPlaylistId(id);
         const success = await this.playlistService.deletePlaylist(id, userId);
         return { success };
     }
@@ -47,6 +48,18 @@ let PlaylistController = class PlaylistController {
         const userId = req.user.id;
         await this.playlistService.getPlaylistById(id, userId);
         const success = await this.playlistTrackService.addTrackToPlaylist(id, body.trackId);
+        return { success };
+    }
+    async getPlaylistTracks(req, id) {
+        const userId = req.user.id;
+        await this.playlistService.getPlaylistById(id, userId);
+        const tracks = await this.playlistTrackService.getPlaylistTracks(id);
+        return tracks;
+    }
+    async removeTrackFromPlaylist(req, id, trackId) {
+        const userId = req.user.id;
+        await this.playlistService.getPlaylistById(id, userId);
+        const success = await this.playlistTrackService.removeTrackFromPlaylist(id, trackId);
         return { success };
     }
 };
@@ -106,6 +119,25 @@ __decorate([
     __metadata("design:paramtypes", [Object, Number, Object]),
     __metadata("design:returntype", Promise)
 ], PlaylistController.prototype, "addTrackToPlaylist", null);
+__decorate([
+    (0, common_1.Get)(':id/tracks'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Number]),
+    __metadata("design:returntype", Promise)
+], PlaylistController.prototype, "getPlaylistTracks", null);
+__decorate([
+    (0, common_1.Delete)(':id/tracks/:trackId'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Param)('trackId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Number, String]),
+    __metadata("design:returntype", Promise)
+], PlaylistController.prototype, "removeTrackFromPlaylist", null);
 exports.PlaylistController = PlaylistController = __decorate([
     (0, common_1.Controller)('playlists'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),

@@ -6,4 +6,5 @@ export declare class PlaylistTrackService {
     addTrackToPlaylist(playlistId: number, trackId: string): Promise<boolean>;
     removeTrackFromPlaylist(playlistId: number, trackId: string): Promise<boolean>;
     getPlaylistTracks(playlistId: number): Promise<PlaylistTrack[]>;
+    deleteTracksByPlaylistId(playlistId: number): Promise<void>;
 }

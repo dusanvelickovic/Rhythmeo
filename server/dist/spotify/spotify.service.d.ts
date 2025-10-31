@@ -7,4 +7,5 @@ export declare class SpotifyService {
     constructor(http: HttpService, authService: AuthService);
     getUsersTopTracks(spotifyId: string, timeRange?: 'short_term' | 'medium_term' | 'long_term', limit?: number): Promise<any[]>;
     getTracksByIds(spotifyId: string, trackIds: string[]): Promise<any>;
+    getTrackById(spotifyId: string, trackId: string): Promise<any>;
 }

@@ -16,4 +16,8 @@ export declare class PlaylistController {
     }): Promise<{
         success: boolean;
     }>;
+    getPlaylistTracks(req: any, id: number): Promise<import("../playlist-track/playlist-track.entity").PlaylistTrack[]>;
+    removeTrackFromPlaylist(req: any, id: number, trackId: string): Promise<{
+        success: boolean;
+    }>;
 }

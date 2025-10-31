@@ -24,6 +24,14 @@ let UsersService = class UsersService {
     findBySpotifyId(spotifyId) {
         return this.userRepository.findOneBy({ spotifyId });
     }
+    async getSpotifyIdById(id) {
+        const user = await this.userRepository
+            .findOne({
+            where: { id },
+            select: ['spotifyId'],
+        });
+        return user ? user.spotifyId : null;
+    }
 };
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([

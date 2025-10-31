@@ -12,9 +12,12 @@ const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const typeorm_1 = require("@nestjs/typeorm");
 const config_1 = require("@nestjs/config");
+const serve_static_1 = require("@nestjs/serve-static");
+const path_1 = require("path");
 const auth_module_1 = require("./auth/auth.module");
 const users_module_1 = require("./users/users.module");
 const spotify_module_1 = require("./spotify/spotify.module");
+const spotify_search_module_1 = require("./spotify-search/spotify-search.module");
 const liked_tracks_module_1 = require("./liked-tracks/liked-tracks.module");
 const playlist_module_1 = require("./playlist/playlist.module");
 const playlist_track_module_1 = require("./playlist-track/playlist-track.module");
@@ -27,6 +30,10 @@ exports.AppModule = AppModule = __decorate([
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
                 envFilePath: '.env',
+            }),
+            serve_static_1.ServeStaticModule.forRoot({
+                rootPath: (0, path_1.join)(__dirname, '..', 'client'),
+                exclude: ['/api*'],
             }),
             typeorm_1.TypeOrmModule.forRootAsync({
                 imports: [config_1.ConfigModule],
@@ -50,6 +57,7 @@ exports.AppModule = AppModule = __decorate([
             auth_module_1.AuthModule,
             users_module_1.UsersModule,
             spotify_module_1.SpotifyModule,
+            spotify_search_module_1.SpotifySearchModule,
             liked_tracks_module_1.LikedTracksModule,
             playlist_module_1.PlaylistModule,
             playlist_track_module_1.PlaylistTrackModule,

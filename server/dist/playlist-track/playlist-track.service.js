@@ -48,6 +48,9 @@ let PlaylistTrackService = class PlaylistTrackService {
             order: { id: 'ASC' }
         });
     }
+    async deleteTracksByPlaylistId(playlistId) {
+        await this.playlistTrackRepository.delete({ playlistId });
+    }
 };
 exports.PlaylistTrackService = PlaylistTrackService;
 exports.PlaylistTrackService = PlaylistTrackService = __decorate([

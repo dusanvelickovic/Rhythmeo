@@ -16,12 +16,13 @@ exports.UserController = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const users_service_1 = require("./users.service");
+const current_user_decorator_1 = require("../auth/decorators/current-user.decorator");
 let UserController = class UserController {
     constructor(userService) {
         this.userService = userService;
     }
-    async getCurrentUser(req) {
-        const user = await this.userService.findBySpotifyId(req.user.spotifyId);
+    async getCurrentUser(spotifyId) {
+        const user = await this.userService.findBySpotifyId(spotifyId);
         delete user.spotifyId;
         delete user.accessToken;
         delete user.refreshToken;
@@ -42,9 +43,9 @@ exports.UserController = UserController;
 __decorate([
     (0, common_1.Get)('me'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    __param(0, (0, common_1.Req)()),
+    __param(0, (0, current_user_decorator_1.CurrentUser)('spotifyId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getCurrentUser", null);
 exports.UserController = UserController = __decorate([

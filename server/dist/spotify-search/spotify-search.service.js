@@ -9,53 +9,30 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SpotifyService = void 0;
+exports.SpotifySearchService = void 0;
 const common_1 = require("@nestjs/common");
 const axios_1 = require("@nestjs/axios");
 const rxjs_1 = require("rxjs");
 const auth_service_1 = require("../auth/auth.service");
-let SpotifyService = class SpotifyService {
+let SpotifySearchService = class SpotifySearchService {
     constructor(http, authService) {
         this.http = http;
         this.authService = authService;
         this.spotifyApiUrl = 'https://api.spotify.com/v1';
     }
-    async getUsersTopTracks(spotifyId, timeRange = 'medium_term', limit = 20) {
+    async search(spotifyId, query, type = 'track', limit = 20) {
         const accessToken = await this.authService.getAccessToken(spotifyId);
         const headers = {
             Authorization: `Bearer ${accessToken}`,
         };
-        const url = `${this.spotifyApiUrl}/me/top/tracks`;
-        try {
-            const response = await (0, rxjs_1.firstValueFrom)(this.http.get(url, { headers }));
-            return response.data;
-        }
-        catch (error) {
-            throw new Error(`Spotify API error: ${error.response?.data?.error?.message || error.message}`);
-        }
-    }
-    async getTracksByIds(spotifyId, trackIds) {
-        const accessToken = await this.authService.getAccessToken(spotifyId);
-        const headers = {
-            Authorization: `Bearer ${accessToken}`,
+        const url = `${this.spotifyApiUrl}/search`;
+        const params = {
+            q: query,
+            type: type,
+            limit: limit.toString(),
         };
-        const url = `${this.spotifyApiUrl}/tracks?ids=${trackIds.join(',')}`;
         try {
-            const response = await (0, rxjs_1.firstValueFrom)(this.http.get(url, { headers }));
-            return response.data;
-        }
-        catch (error) {
-            throw new Error(`Spotify API error: ${error.response?.data?.error?.message || error.message}`);
-        }
-    }
-    async getTrackById(spotifyId, trackId) {
-        const accessToken = await this.authService.getAccessToken(spotifyId);
-        const headers = {
-            Authorization: `Bearer ${accessToken}`,
-        };
-        const url = `${this.spotifyApiUrl}/tracks/${trackId}`;
-        try {
-            const response = await (0, rxjs_1.firstValueFrom)(this.http.get(url, { headers }));
+            const response = await (0, rxjs_1.firstValueFrom)(this.http.get(url, { headers, params }));
             return response.data;
         }
         catch (error) {
@@ -63,10 +40,10 @@ let SpotifyService = class SpotifyService {
         }
     }
 };
-exports.SpotifyService = SpotifyService;
-exports.SpotifyService = SpotifyService = __decorate([
+exports.SpotifySearchService = SpotifySearchService;
+exports.SpotifySearchService = SpotifySearchService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [axios_1.HttpService,
         auth_service_1.AuthService])
-], SpotifyService);
-//# sourceMappingURL=spotify.service.js.map
+], SpotifySearchService);
+//# sourceMappingURL=spotify-search.service.js.map

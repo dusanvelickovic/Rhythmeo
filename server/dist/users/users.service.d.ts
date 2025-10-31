@@ -4,4 +4,5 @@ export declare class UsersService {
     private userRepository;
     constructor(userRepository: Repository<User>);
     findBySpotifyId(spotifyId: string): Promise<User>;
+    getSpotifyIdById(id: string): Promise<string | null>;
 }
