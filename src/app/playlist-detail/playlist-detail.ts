@@ -173,6 +173,13 @@ export class PlaylistDetail implements OnInit, OnDestroy {
      */
     removeTrack(track: Track, event: Event) {
         event.stopPropagation();
+        
+        const confirmed = confirm(`Are you sure you want to remove "${track.name}" from this playlist?`);
+        
+        if (!confirmed) {
+            return;
+        }
+
         this.store.dispatch(PlaylistActions.removeTrackFromPlaylist({
             playlistId: this.playlistId,
             trackId: track.id
