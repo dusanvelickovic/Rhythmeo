@@ -12,6 +12,7 @@ import * as PlayerActions from '../../store/player/player.actions';
 })
 export class MiniPlayer implements OnInit, OnDestroy {
     @Input() isModalOpen: boolean = false;
+    @Input() nextTrackUri: string | null = null;
     @Output() trackClicked = new EventEmitter<void>();
 
     playerState: PlayerState | null = null;
@@ -40,6 +41,11 @@ export class MiniPlayer implements OnInit, OnDestroy {
                         this.playerState.duration
                     );
                     this.store.dispatch(PlayerActions.updatePosition({ position: newPosition }));
+                    
+                    // Check if song has ended and play next track if available
+                    if (newPosition >= this.playerState.duration && this.nextTrackUri) {
+                        this.store.dispatch(PlayerActions.play({ uri: this.nextTrackUri }));
+                    }
                 }
             });
     }

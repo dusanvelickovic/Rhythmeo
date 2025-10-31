@@ -123,4 +123,8 @@
     }
 </div>
 
-<app-mini-player [isModalOpen]="isTrackModalOpen()" (trackClicked)="onMiniPlayerClicked()"></app-mini-player>
+<app-mini-player
+    [isModalOpen]="isTrackModalOpen()"
+    [nextTrackUri]="nextTrack()?.uri || null"
+    (trackClicked)="onMiniPlayerClicked()"
+></app-mini-player>

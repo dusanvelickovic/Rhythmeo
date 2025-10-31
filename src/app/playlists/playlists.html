@@ -90,4 +90,8 @@
     ></app-track-modal>
 }
 
-<app-mini-player [isModalOpen]="isTrackModalOpen()" (trackClicked)="onMiniPlayerClicked()"></app-mini-player>
+<app-mini-player
+    [isModalOpen]="isTrackModalOpen()"
+    [nextTrackUri]="null"
+    (trackClicked)="onMiniPlayerClicked()"
+></app-mini-player>
