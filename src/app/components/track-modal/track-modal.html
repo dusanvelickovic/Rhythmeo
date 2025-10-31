@@ -1,29 +1,40 @@
 <div class="bg-gradient-to-br from-gray-900 via-purple-900 to-black min-h-screen text-white track-modal-wrapper">
-    <div class="container mx-auto">
-        <!-- Main Content -->
-        <div class="grid grid-cols-2 gap-16 items-center relative h-full">
+    <div class="container mx-auto px-4 sm:px-6">
+        <!-- Close button - Mobile & Desktop -->
+        <div class="absolute top-4 right-4 sm:top-6 sm:right-6 z-10">
+            <svg (click)="closeModal()"
+                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 sm:w-7 sm:h-7 text-gray-400 hover:text-white cursor-pointer transition-colors">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+        </div>
+
+        <!-- Mobile Layout -->
+        <div class="md:hidden flex flex-col items-center justify-center py-8 space-y-6">
+            <!-- Song Info -->
+            <div class="flex flex-col items-center text-center px-4 w-full">
+                <div class="text-sm sm:text-sm text-gray-400 mb-3 tracking-wide">{{ track?.artists?.at(0)?.name }}</div>
+                <h1 class="text-3xl sm:text-3xl font-bold mb-2 leading-tight tracking-wide">{{ track?.name }}</h1>
+                <div class="text-sm text-gray-500 tracking-wide">{{ track?.album?.name }}</div>
+            </div>
+
+            <!-- Vinyl Player -->
+            <div class="flex flex-col items-center justify-center w-full flex-1">
+                <app-spotify-player
+                    [track]="track"
+                    [nextTrackUri]="nextTracks.at(0)?.uri!"
+                    [previousTrackUri]="previousTracks.at(0)?.uri!"
+                    (nextTrackRequested)="onNextTrackRequested()"
+                    (previousTrackRequested)="onPreviousTrackRequested()"
+                ></app-spotify-player>
+            </div>
+        </div>
+
+        <!-- Desktop Layout -->
+        <div class="hidden md:grid grid-cols-2 gap-16 items-center relative h-full">
             <!-- Left Side - Song Info -->
             <div class="flex flex-col justify-start h-[80vh]">
                 <div class="text-base text-gray-400 mb-6 tracking-widest">{{ track?.artists?.at(0)?.name }} // {{ track?.album?.name }}</div>
                 <h1 class="text-5xl font-bold mb-16 leading-tight tracking-wide wrap-normal w-3/4">{{ track?.name }}</h1>
-
-                <!-- Lyrics Section -->
-<!--                <div class="space-y-4">-->
-<!--                    <div class="text-sm text-gray-500 tracking-wider mb-4">&#123; LYRICS &#125;</div>-->
-<!--                    <p class="text-gray-400 leading-relaxed">-->
-<!--                        Me and my girlies, we gon' party 'til it's early<br>-->
-<!--                        Got me feeling otherworldly tonight-->
-<!--                    </p>-->
-<!--                    <p class="text-white leading-relaxed">-->
-<!--                        Caught in some traffic, but the radio is<br>-->
-<!--                        blasting Drop a red light and we'll sing it<br>-->
-<!--                        goodbye-->
-<!--                    </p>-->
-<!--                    <p class="text-gray-400 leading-relaxed">-->
-<!--                        Me and my girlies, we gon' party 'til it's early<br>-->
-<!--                        Got me feeling otherworldly tonight-->
-<!--                    </p>-->
-<!--                </div>-->
             </div>
 
             <!-- Center - Vinyl Player -->
@@ -35,15 +46,6 @@
                     (nextTrackRequested)="onNextTrackRequested()"
                     (previousTrackRequested)="onPreviousTrackRequested()"
                 ></app-spotify-player>
-            </div>
-
-            <!-- Right side -->
-            <div class="flex flex-col items-end justify-between h-full">
-                <!-- Close button -->
-                <svg (click)="closeModal()"
-                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-7 text-gray-400 cursor-pointer">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                </svg>
             </div>
         </div>
     </div>
