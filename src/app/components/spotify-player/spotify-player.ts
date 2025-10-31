@@ -24,6 +24,7 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
     @Output() previousTrackRequested = new EventEmitter<void>();
 
     private destroy$ = new Subject<void>();
+    private isSeeking = false;
     public showVolumeSlider = signal(false);
     public showAddToPlaylist = signal(false);
 
@@ -125,24 +126,6 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
         if (this.track?.id) {
             this.updateLikedStatusObservable();
         }
-
-        // Update position every second
-        interval(1000)
-            .pipe(takeUntil(this.destroy$))
-            .subscribe(() => {
-                if (this.playerState && !this.playerState.paused) {
-                    const newPosition = Math.min(
-                        this.playerState.position + 1000,
-                        this.playerState.duration
-                    );
-                    this.store.dispatch(PlayerActions.updatePosition({ position: newPosition }));
-
-                    // Check if song has ended and play next track if available
-                    if (newPosition >= this.playerState.duration && this.nextTrackUri) {
-                        this.nextTrack();
-                    }
-                }
-            });
     }
 
     private songWasPlayed = false;
@@ -196,12 +179,20 @@ export class SpotifyPlayer implements OnInit, OnChanges, OnDestroy{
     }
 
     /**
+     * Handle seek start (user starts dragging)
+     */
+    onSeekStart(): void {
+        this.isSeeking = true;
+    }
+
+    /**
      * Handle seek from slider
      */
     onSeek(event: Event): void {
         const input = event.target as HTMLInputElement;
         const position = parseInt(input.value, 10);
         this.store.dispatch(PlayerActions.seek({ position }));
+        this.isSeeking = false;
     }
 
     /**
