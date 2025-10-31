@@ -90,6 +90,26 @@ export class Home implements OnInit, AfterViewInit, OnDestroy {
     }
 
     /**
+     * Navigate to the next slide
+     */
+    slideNext() {
+        const swiperEl = this.getSwiperElement();
+        if (swiperEl?.swiper) {
+            swiperEl.swiper.slideNext();
+        }
+    }
+
+    /**
+     * Navigate to the previous slide
+     */
+    slidePrev() {
+        const swiperEl = this.getSwiperElement();
+        if (swiperEl?.swiper) {
+            swiperEl.swiper.slidePrev();
+        }
+    }
+
+    /**
      * Open the track modal for the selected track
      */
     openTrackModal(track: Track) {
