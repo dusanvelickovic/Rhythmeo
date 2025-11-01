@@ -43,3 +43,6 @@ __screenshots__/
 Thumbs.db
 
 .env
+.env.production
+
+server/dist
