@@ -1,16 +1,44 @@
 # rhythmeo
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.5.
+A full-stack music application built with Angular and NestJS.
 
-## Development server
+## Quick Start with Docker (Recommended)
 
-To start a local development server, run:
+The easiest way to run the application:
 
 ```bash
-ng serve
+./docker-start.sh
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Or manually:
+
+**Development mode:**
+```bash
+docker-compose -f docker-compose.dev.yml up --build
+```
+
+**Production mode:**
+```bash
+docker-compose up --build
+```
+
+See [DOCKER.md](DOCKER.md) for detailed Docker instructions.
+
+## Development server (Local)
+
+To start a local development server without Docker, run:
+
+```bash
+npm run start:all
+```
+
+This starts both the Angular frontend (`http://localhost:4200`) and NestJS backend (`http://localhost:3000`).
+
+Or run them separately:
+```bash
+npm start           # Frontend only
+npm run start:server:watch  # Backend only
+```
 
 ## Code scaffolding
 

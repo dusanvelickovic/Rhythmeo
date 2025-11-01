@@ -1,0 +1,22 @@
+FROM node:22-alpine
+
+WORKDIR /app
+
+# Install dependencies for development
+COPY package*.json ./
+RUN npm install
+
+# Copy all source files
+COPY . .
+
+# Create startup script
+RUN echo '#!/bin/sh' > /start.sh && \
+    echo 'npx ng serve --host 0.0.0.0 --proxy-config proxy.conf.json &' >> /start.sh && \
+    echo 'npm run start:server:watch' >> /start.sh && \
+    chmod +x /start.sh
+
+# Expose ports for Angular dev server and NestJS
+EXPOSE 4200 3000
+
+# Start both frontend and backend in development mode
+CMD ["/start.sh"]

@@ -1,7 +1,7 @@
 services:
     postgres:
         image: postgres:15
-        container_name: rhythmeo-postgres
+        container_name: rhythmeo-postgres-dev
         restart: always
         environment:
             - POSTGRES_USER=${DB_USERNAME}
@@ -12,7 +12,7 @@ services:
         ports:
             - '5432:5432'
         volumes:
-            - postgres_data:/var/lib/postgresql/data
+            - postgres_data_dev:/var/lib/postgresql/data
         healthcheck:
             test: ['CMD-SHELL', 'pg_isready -U ${DB_USERNAME}']
             interval: 10s
@@ -22,13 +22,14 @@ services:
     app:
         build:
             context: .
-            dockerfile: Dockerfile
-        container_name: rhythmeo-app
+            dockerfile: Dockerfile.dev
+        container_name: rhythmeo-app-dev
         restart: always
         ports:
+            - '4200:4200'
             - '3000:3000'
         environment:
-            - NODE_ENV=production
+            - NODE_ENV=development
             - DB_HOST=postgres
             - DB_PORT=5432
             - DB_USERNAME=${DB_USERNAME}
@@ -36,15 +37,18 @@ services:
             - DB_NAME=${DB_NAME}
         env_file:
             - .env
+        volumes:
+            - ./src:/app/src
+            - ./server:/app/server
+            - ./angular.json:/app/angular.json
+            - ./tsconfig.json:/app/tsconfig.json
+            - ./tsconfig.app.json:/app/tsconfig.app.json
+            - ./ormconfig.ts:/app/ormconfig.ts
+            - ./ormconfig.js:/app/ormconfig.js
+            - ./.postcssrc.json:/app/.postcssrc.json
         depends_on:
             postgres:
                 condition: service_healthy
-        healthcheck:
-            test: ['CMD', 'node', '-e', "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
-            interval: 30s
-            timeout: 3s
-            start_period: 40s
-            retries: 3
 
 volumes:
-    postgres_data:
+    postgres_data_dev:
