@@ -12,6 +12,7 @@ RUN npm ci
 # Copy source files needed for Angular build
 COPY angular.json ./
 COPY tsconfig*.json ./
+COPY .postcssrc.json ./
 COPY src ./src
 COPY public ./public
 

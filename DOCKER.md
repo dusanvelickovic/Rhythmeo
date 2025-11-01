@@ -68,3 +68,16 @@ docker-compose down -v
 # Access container shell
 docker exec -it rhythmeo-app-dev sh
 ```
+
+## Troubleshooting
+
+### CSS not displaying correctly
+If CSS doesn't render properly, ensure:
+- `.postcssrc.json` is included in volume mounts (dev)
+- `.postcssrc.json` is copied during Docker build (production)
+- `@source` directive is present in `src/styles.css`
+
+### Common Issues
+- **API routes returning 500**: Check `ServeStaticModule` path in `app.module.ts`
+- **Container won't start**: Check logs with `docker logs rhythmeo-app`
+- **Database connection failed**: Ensure PostgreSQL is healthy before app starts

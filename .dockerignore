@@ -40,7 +40,6 @@ jasmine.json
 .editorconfig
 .prettierrc
 .prettierignore
-.postcssrc.json
 
 # Temp files
 tmp

@@ -20,8 +20,7 @@ import { PlaylistTrackModule } from './playlist-track/playlist-track.module';
             envFilePath: '.env',
         }),
         ServeStaticModule.forRoot({
-            rootPath: join(__dirname, '..', 'client'),
-            exclude: ['/api*'],
+            rootPath: join(__dirname, 'client'),
         }),
         TypeOrmModule.forRootAsync({
             imports: [ConfigModule],
