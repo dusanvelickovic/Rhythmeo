@@ -14,6 +14,7 @@ import * as PlaylistActions from '../store/playlist/playlist.actions';
 import { selectPlaylistById } from '../store/playlist/playlist.selectors';
 import { Playlist } from '../store/playlist/playlist.state';
 import * as PlayerSelectors from '../store/player/player.selectors';
+import { environment } from '../../environments/environment';
 
 @Component({
     selector: 'app-playlist-detail',
@@ -23,7 +24,7 @@ import * as PlayerSelectors from '../store/player/player.selectors';
 })
 export class PlaylistDetail implements OnInit, OnDestroy {
     private destroy$ = new Subject<void>();
-    private apiUrl = 'http://localhost:3000';
+    private apiUrl = environment.apiUrl;
     private playlistId: number = 0;
 
     playlist = signal<Playlist | null>(null);

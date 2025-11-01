@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface RedirectObject {
     redirectUrl: string;
@@ -10,7 +11,7 @@ export interface RedirectObject {
     providedIn: 'root',
 })
 export class LoginService {
-    private apiUrl = 'http://api.rhythmeo.test:3000';
+    private apiUrl = environment.apiUrl;
 
     constructor(private http: HttpClient) {}
 

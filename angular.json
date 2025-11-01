@@ -55,10 +55,14 @@
                             "buildTarget": "rhythmeo:build:production"
                         },
                         "development": {
-                            "buildTarget": "rhythmeo:build:development"
+                            "buildTarget": "rhythmeo:build:development",
+                            "proxyConfig": "proxy.conf.json"
                         }
                     },
                     "defaultConfiguration": "development",
+                    "options": {
+                        "proxyConfig": "proxy.conf.json"
+                    }
                 },
                 "extract-i18n": {
                     "builder": "@angular/build:extract-i18n"

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Playlist } from '../../store/playlist/playlist.state';
+import { environment } from '../../../environments/environment';
 
 export interface CreatePlaylistDto {
     name: string;
@@ -11,7 +12,7 @@ export interface CreatePlaylistDto {
     providedIn: 'root'
 })
 export class PlaylistService {
-    private apiUrl = 'http://localhost:3000/playlists';
+    private apiUrl = `${environment.apiUrl}/playlists`;
 
     constructor(private http: HttpClient) {}
 

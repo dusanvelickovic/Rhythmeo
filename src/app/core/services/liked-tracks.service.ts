@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface LikeTrackDto {
     trackId: string;
@@ -25,7 +26,7 @@ export interface LikedTrack {
     providedIn: 'root'
 })
 export class LikedTracksService {
-    private apiUrl = 'http://localhost:3000/liked-tracks';
+    private apiUrl = `${environment.apiUrl}/liked-tracks`;
 
     constructor(private http: HttpClient) {}
 

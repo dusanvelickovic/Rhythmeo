@@ -5,12 +5,13 @@ import { Store } from '@ngrx/store';
 import { User } from '../types/user';
 import * as AuthActions from '../../store/auth/auth.actions';
 import * as AuthSelectors from '../../store/auth/auth.selectors';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AuthService {
-    private apiUrl = 'http://localhost:3000';
+    private apiUrl = environment.apiUrl;
     public currentUser$: Observable<User | null>;
     public isAuthenticated$: Observable<boolean>;
 

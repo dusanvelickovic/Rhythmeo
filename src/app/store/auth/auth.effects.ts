@@ -6,10 +6,11 @@ import { of } from 'rxjs';
 import { map, catchError, tap, switchMap } from 'rxjs/operators';
 import * as AuthActions from './auth.actions';
 import { User } from '../../core/types/user';
+import { environment } from '../../../environments/environment';
 
 @Injectable()
 export class AuthEffects {
-    private apiUrl = 'http://localhost:3000';
+    private apiUrl = environment.apiUrl;
     private actions$ = inject(Actions);
     private http = inject(HttpClient);
     private router = inject(Router);
